@@ -1,18 +1,23 @@
-
-#[derive(PartialOrd, PartialEq, Copy, Clone)]
 enum InfixToken{
     Value(f64),
-    RightParethesies,
-    LeftParenthesies,
-    Minus,
     Plus,
-    Slash,
+    Minus,
     Star,
-    Caret,
-    Root,
+    Slash,
     Sin,
     Cos,
-    ExclamMark,
+    RightParethesies,
+    LeftParenthesies,
+}
+
+enum PrefixToken{
+    Value(f64),
+    Plus,
+    Minus,
+    Star,
+    Slash,
+    Sin,
+    Cos,
 }
 
 enum BinaryFunctions {
@@ -20,8 +25,6 @@ enum BinaryFunctions {
     Sub,
     Mul,
     Div,
-    Pow,
-    Root,
 }
 
 enum UnaryFunctions{
@@ -60,12 +63,6 @@ enum Expression {
     BinaryFunction{kind:BinaryFunctions, x:Box<Expression>, y:Box<Expression>},
     UnaryFunction{kind:UnaryFunctions, x:Box<Expression>},
     Value(f64),
-}
-
-#[derive(PartialEq)]
-enum TokenOrExpression{
-    Expression(Expression),
-    Token(PrefixToken),
 }
 
 
