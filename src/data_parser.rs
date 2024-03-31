@@ -1,13 +1,14 @@
+#[derive(PartialOrd, PartialEq)]
 enum InfixToken{
     Value(f64),
-    Plus,
     Minus,
-    Star,
+    Plus,
     Slash,
-    Sin,
-    Cos,
+    Star,
     Caret,
     Root,
+    Sin,
+    Cos,
     ExclamMark,
     RightParethesies,
     LeftParenthesies,
@@ -49,7 +50,7 @@ impl InfixToken{
     }
     fn Value(&self) -> bool{
         match self {
-            InfixToken::Value(i) => true,
+            InfixToken::Value(_i) => true,
             _ => false,
         }
     }
@@ -68,45 +69,55 @@ enum PrefixToken{
     ExclamMark,
 }
 
+//potom to definuj pro Vec<InfixToken> ať se to dá jen zavolat na outputu
 impl PrefixToken{
     fn make_prefix(mut infix: Vec<InfixToken>) -> Vec<PrefixToken>{
         let mut stack: Vec<InfixToken> = Vec::new();
         let mut reversePrefix: Vec<PrefixToken> = Vec::new();
         infix.reverse();
-        while !infix.is_empty() {
-            match infix.last(){
-                Some(infixToken) => {
-                    match infixToken {
-                        InfixToken::Value(i) => reversePrefix.push(infixToken.ToPrefix()),
-                        InfixToken::Plus => {
-                            match stack.last() {
-                                Some(prefixToken) => {
-                                    match prefixToken {
-                                        PrefixToken::Caret => reversePrefix.push(stack.pop()),
-                                        PrefixToken::Root => reversePrefix.push(stack.pop()),
-                                        PrefixToken::Slash => reversePrefix.push(stack.pop()), // tady se to musí převést ze Some<T> na T
-                                        PrefixToken::Star => reversePrefix.push(stack.pop()),
-                                        _ => reversePrefix.push(infixToken.ToPrefix()),
-                                    }
-                                }
-                                None => stack.push(infixToken.ToPrefix()),
-                            }
-                        },
-                        InfixToken::Minus => {},
-                        InfixToken::Star => {},
-                        InfixToken::Slash => {},
-                        InfixToken::Sin => {},
-                        InfixToken::Cos => {},
-                        InfixToken::Caret => {},
-                        InfixToken::Root => {},
-                        InfixToken::ExclamMark => {},
-                        InfixToken::RightParethesies => {},
-                        InfixToken::LeftParenthesies => {},
+        while let Some(infix_token) = infix.last() {
+            match infix_token{
+                InfixToken::Value(_i) => {
+                    reversePrefix.push(infix_token.ToPrefix());
+                    infix.pop();
+                },
+                InfixToken::Sin |
+                InfixToken::Cos |
+                InfixToken::ExclamMark => {
+                    reversePrefix.push(infix_token.ToPrefix());
+                    infix.pop();
+                },
+                InfixToken::Plus |
+                InfixToken::Minus |
+                InfixToken::Star |
+                InfixToken::Slash |
+                InfixToken::Caret |
+                InfixToken::Root => {
+                    if stack.is_empty() {
+                        stack.push(*infix_token)
                     }
-                }
-                None => panic!(),
+                    while stack.last() >= Some(infix_token) {
+                        match stack.pop() {
+                            Some(stack_token) => reversePrefix.push(stack_token.ToPrefix()),
+                            None => panic!(),
+                        };
+                    }
+                    stack.push(*infix_token);
+                },
+
+                InfixToken::RightParethesies => {
+                    stack.push(*infix_token);
+                },
+                InfixToken::LeftParenthesies => {
+                    while let Some(stack_token) = stack.pop() {
+                        if stack_token == InfixToken::RightParethesies{
+                            stack.pop();
+                            break;
+                        }
+                        reversePrefix.push(stack_token.ToPrefix());
+                    }
+                },
             };
-            infix.pop();
         }
         reversePrefix
     }
