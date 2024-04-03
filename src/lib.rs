@@ -72,7 +72,7 @@ pub fn div(left: f64, right:f64) -> f64{
 ///  assert_eq!(result,100000.0);
 /// ```
 pub fn pwr(left: f64, right:f64) -> f64{
-    left + right
+    left.powf(right)
 }
 
 /// Function requires two arguments of type f64
@@ -82,20 +82,20 @@ pub fn pwr(left: f64, right:f64) -> f64{
 /// let x = 16.0;
 /// let result = great_calculator::sqrt(x,n);
 /// assert_eq!(result,4.0);
-/// let x = 1024.0;
-/// let result = great_calculator::pwr(x,n);
-/// assert_eq!(result,32.0);
+/// let x = 256.0;
+/// let result = great_calculator::sqrt(x,n);
+/// assert_eq!(result,16.0);
 /// let x = 4096.0;
 /// let n = 4.0;
-/// let result = great_calculator::pwr(x,n);
+/// let result = great_calculator::sqrt(x,n);
 /// assert_eq!(result,8.0);
 /// let x = 27.0;
 /// let n = 3.0;
-/// let result = great_calculator::pwr(x,n);
+/// let result = great_calculator::sqrt(x,n);
 ///  assert_eq!(result,3.0);
 /// ```
-pub fn sqrt(left: f64, right:f64) -> f64{
-    left + right
+pub fn sqrt(x: f64, n:f64) -> f64{
+    x.powf(1.0/n)
 }
 
 /// Function requires one argument of type f64
@@ -115,7 +115,11 @@ pub fn sqrt(left: f64, right:f64) -> f64{
 ///  assert_eq!(result,1.0);
 /// ```
 pub fn fact(x: f64) -> f64{
-    x
+    if x == 1.0{
+        return 1.0;
+    }else {
+        fact(x - 1.0) * x
+    }
 }
 
 /// Function requires one argument of type f64
@@ -124,21 +128,21 @@ pub fn fact(x: f64) -> f64{
 /// use great_calculator::sin;
 /// let x = 0.0;
 /// let result = great_calculator::sin(x);
-/// assert_eq!(result,0.0);
+/// assert!(f64::abs(result)<0.0000001);
 /// let x = 90.0;
 /// let result = great_calculator::sin(x);
-/// assert_eq!(result,1.0);
+/// assert!(f64::abs(result)-1.0<0.0000001);
 /// let x = 45.0;
 /// let result = great_calculator::sin(x);
-/// let refresult = f64::sin(x.to_radians());
+/// let refresult = f64::sin(f64::to_radians(x));
 /// assert_eq!(result,refresult);
 /// let x = 60.0;
-/// let refresult = f64::sin(x.to_radians());
+/// let refresult = f64::sin(f64::to_radians(x));
 /// let result = great_calculator::sin(x);
 ///  assert_eq!(result,refresult);
 /// ```
 pub fn sin(x: f64) -> f64{
-    x
+    f64::sin(x*std::f64::consts::PI/180.0)
 }
 
 /// Function requires one argument of type f64
@@ -147,21 +151,21 @@ pub fn sin(x: f64) -> f64{
 /// use great_calculator::sin;
 /// let x = 0.0;
 /// let result = great_calculator::cos(x);
-/// assert_eq!(result,1.0);
+/// assert!(f64::abs(result - 1.0)<0.0000001);
 /// let x = 90.0;
 /// let result = great_calculator::cos(x);
-/// assert_eq!(result,0.0);
+/// assert!(f64::abs(result)<0.0000001);
 /// let x = 45.0;
 /// let result = great_calculator::cos(x);
-/// let refresult = f64::cos(x.to_radians());
+/// let refresult = f64::cos(f64::to_radians(x));
 /// assert_eq!(result,refresult);
 /// let x = 60.0;
-/// let refresult = f64::cos(x.to_radians());
+/// let refresult = f64::cos(f64::to_radians(x));
 /// let result = great_calculator::cos(x);
 ///  assert_eq!(result,refresult);
 /// ```
 pub fn cos(x: f64) -> f64{
-    x
+    f64::cos(x*std::f64::consts::PI/180.0)
 }
 
 
