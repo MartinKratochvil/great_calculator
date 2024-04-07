@@ -1,4 +1,6 @@
+#[cfg(test)]
 /// Function requires two arguments of type f64
+///
 /// returns arg1 + arg2
 /// ```
 /// // Some documentation.
@@ -13,6 +15,7 @@ pub fn add(left: f64, right: f64) -> f64{
 }
 
 /// Function requires two arguments of type f64
+///
 /// returns arg1 - arg2
 /// ```
 /// let x = 36;
@@ -26,6 +29,7 @@ pub fn sub(left: f64, right: f64) -> f64{
 }
 
 /// Function requires two arguments of type f64
+///
 /// returns arg1 * arg2
 /// ```
 /// let x = 15.0;
@@ -40,6 +44,7 @@ pub fn mul(left: f64, right:f64) -> f64{
 }
 
 /// Function requires two arguments of type f64
+///
 /// returns arg1 / arg2
 /// ```
 /// let x = 40.0;
@@ -56,6 +61,7 @@ pub fn div(left: f64, right:f64) -> f64{
 }
 
 /// Function requires two arguments of type f64
+///
 /// returns arg1^{arg2}
 /// ```
 /// let x = 2.0;
@@ -76,6 +82,7 @@ pub fn pwr(left: f64, right:f64) -> f64{
 }
 
 /// Function requires two arguments of type f64
+///
 /// returns arg2-th Sqrt of arg1
 /// ```
 /// let n = 2.0;
@@ -99,6 +106,7 @@ pub fn sqrt(x: f64, n:f64) -> f64{
 }
 
 /// Function requires one argument of type f64
+///
 /// returns factorial of arg1...arg1!
 /// ```
 /// let x = 3.0;
@@ -114,24 +122,25 @@ pub fn sqrt(x: f64, n:f64) -> f64{
 /// let result = great_calculator::fact(x);
 ///  assert_eq!(result,1.0);
 /// ```
-pub fn fact(x: f64) -> f64{
+pub fn fact(x: f64) -> f64{  //Counts factorial using recursion
     if x == 1.0{
         return 1.0;
     }else {
-        fact(x - 1.0) * x
+        fact(x - 1.0) * x //function calls itself with argument x-1 until it reduces to 1, then it multiplies by x in every level
     }
 }
 
 /// Function requires one argument of type f64
+///
 /// returns sine of arg1...sin(arg1)
 /// ```
 /// use great_calculator::sin;
 /// let x = 0.0;
 /// let result = great_calculator::sin(x);
-/// assert!(f64::abs(result)<0.0000001);
+/// assert_eq!(result,0.0);
 /// let x = 90.0;
 /// let result = great_calculator::sin(x);
-/// assert!(f64::abs(result)-1.0<0.0000001);
+/// assert_eq!(result,1.0);
 /// let x = 45.0;
 /// let result = great_calculator::sin(x);
 /// let refresult = f64::sin(f64::to_radians(x));
@@ -142,19 +151,26 @@ pub fn fact(x: f64) -> f64{
 ///  assert_eq!(result,refresult);
 /// ```
 pub fn sin(x: f64) -> f64{
-    f64::sin(x*std::f64::consts::PI/180.0)
+    let y = x as i64;
+    match (y%360+360)%360 { // if inputed with negative value, transfers it into positive equivalent
+        0 | 180 => 0.0,
+        90 => 1.0,
+        270 => -1.0,
+        _=> f64::sin(x*std::f64::consts::PI/180.0),
+    }
 }
 
 /// Function requires one argument of type f64
+///
 /// returns cosine of arg1...cos(arg1)
 /// ```
 /// use great_calculator::sin;
 /// let x = 0.0;
 /// let result = great_calculator::cos(x);
-/// assert!(f64::abs(result - 1.0)<0.0000001);
+/// assert_eq!(result,1.0);
 /// let x = 90.0;
 /// let result = great_calculator::cos(x);
-/// assert!(f64::abs(result)<0.0000001);
+/// assert_eq!(result,0.0);
 /// let x = 45.0;
 /// let result = great_calculator::cos(x);
 /// let refresult = f64::cos(f64::to_radians(x));
@@ -165,15 +181,17 @@ pub fn sin(x: f64) -> f64{
 ///  assert_eq!(result,refresult);
 /// ```
 pub fn cos(x: f64) -> f64{
-    f64::cos(x*std::f64::consts::PI/180.0)
+    let y = x as i64;
+    match (y%360+360)%360 { // if inputed with negative value, transfers it into positive equivalent
+        0  => 1.0,
+        90 | 270 => 0.0,
+        180 => -1.0,
+        _=> f64::cos(x*std::f64::consts::PI/180.0),
+    }
 }
 
 
-
-
-
 /*
-#[cfg(test)]
 mod test{
     use super::*;
     #[test]
@@ -183,6 +201,5 @@ mod test{
         let sum = add(x,y);
         assert_eq!(sum, 55.0);
     }
-
 }
 */
