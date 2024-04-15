@@ -1,3 +1,5 @@
+
+//Token které příjmá kalkulačka
 enum Token{
     Value(f64),
     Plus,
@@ -26,6 +28,7 @@ enum UnaryFunctions{
     Negate
 }
 
+//definování funkcí pro enum BinaryFuncion
 impl BinaryFunctions{
     fn execute(&self, x:f64, y:f64) -> f64{
         match self {
@@ -39,6 +42,7 @@ impl BinaryFunctions{
     }
 }
 
+//definování funkcí pro enum UnaryFuncion
 impl UnaryFunctions{
     fn execute(&self, x:f64) -> f64{
         match self {
@@ -50,7 +54,10 @@ impl UnaryFunctions{
     }
 }
 
+
 impl Expression {
+
+    //Funkce pro vypočtení stromu Expression
     fn calculate(&self) -> f64{
         match self {
             Expression::BinaryFunction {kind, x, y} => kind.execute(x.calculate(), y.calculate()),
@@ -60,6 +67,7 @@ impl Expression {
     }
 }
 
+//Rekurzivní enum pro celý výraz
 enum Expression {
     BinaryFunction{kind:BinaryFunctions, x:Box<Expression>, y:Box<Expression>},
     UnaryFunction{kind:UnaryFunctions, x:Box<Expression>},
