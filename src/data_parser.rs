@@ -1,4 +1,4 @@
-enum InfixToken{
+enum Token{
     Value(f64),
     Plus,
     Minus,
@@ -10,27 +10,20 @@ enum InfixToken{
     LeftParenthesies,
 }
 
-enum PrefixToken{
-    Value(f64),
-    Plus,
-    Minus,
-    Star,
-    Slash,
-    Sin,
-    Cos,
-}
-
 enum BinaryFunctions {
     Add,
     Sub,
     Mul,
     Div,
+    Pow,
+    Root
 }
 
 enum UnaryFunctions{
     Sin,
     Cos,
     Factorial,
+    Negate
 }
 
 impl BinaryFunctions{
@@ -52,6 +45,7 @@ impl UnaryFunctions{
             UnaryFunctions::Sin => lib::sin(x),
             UnaryFunctions::Cos => lib::cos(x),
             UnaryFunctions::Factorial => lib::fact(x),
+            UnaryFunctions::Negate => -x,
         }
     }
 }
