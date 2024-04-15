@@ -30,13 +30,18 @@ enum BinaryFunctions {
 enum UnaryFunctions{
     Sin,
     Cos,
+    Factorial,
 }
 
 impl BinaryFunctions{
     fn execute(&self, x:f64, y:f64) -> f64{
         match self {
-            BinaryFunctions::Add => x + y,
-            _ => todo!()
+            BinaryFunctions::Add => lib::add(x,y),
+            BinaryFunctions::Sub => lib::sub(x,y),
+            BinaryFunctions::Mul => lib::mul(x,y),
+            BinaryFunctions::Div => lib:div(x,y),
+            BinaryFunctions::Pow => lib::pwr(x,y),
+            BinaryFunctions::Root => lib::sqrt(y,x),
         }
     }
 }
@@ -44,7 +49,9 @@ impl BinaryFunctions{
 impl UnaryFunctions{
     fn execute(&self, x:f64) -> f64{
         match self {
-            _ => todo!()
+            UnaryFunctions::Sin => lib::sin(x),
+            UnaryFunctions::Cos => lib::cos(x),
+            UnaryFunctions::Factorial => lib::fact(x),
         }
     }
 }

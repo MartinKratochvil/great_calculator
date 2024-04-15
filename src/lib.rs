@@ -124,7 +124,7 @@ pub fn sqrt(x: f64, n:f64) -> f64{
 /// ```
 pub fn fact(x: f64) -> f64{  //Counts factorial using recursion
     if x == 1.0{
-        return 1.0;
+        1.0
     }else {
         fact(x - 1.0) * x //function calls itself with argument x-1 until it reduces to 1, then it multiplies by x in every level
     }
