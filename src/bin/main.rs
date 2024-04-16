@@ -1,5 +1,6 @@
+use great_calculator::*;
 
 
 fn main() {
-    println!("Hello, world!");
+    test_parser();
 }

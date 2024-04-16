@@ -125,7 +125,7 @@ pub fn sqrt(x: f64, n:f64) -> f64{
 ///  assert_eq!(result,1.0);
 /// ```
 pub fn fact(x: f64) -> f64{  //Counts factorial using recursion
-    if x == 1.0{
+    if x <= 1.0{
         1.0
     }else {
         fact(x - 1.0) * x //function calls itself with argument x-1 until it reduces to 1, then it multiplies by x in every level
@@ -205,3 +205,81 @@ mod test{
     }
 }
 */
+
+
+pub fn test_parser(){
+    // ((2-/((5^3-3^4)+5)*2)-10)! / 4
+    use data_parser::*;
+    let x = vec![Token::LeftParentheses, Token::LeftParentheses, Token::Value(2.0),
+                 Token::Sqrt, Token::LeftParentheses,Token::LeftParentheses,Token::Value(5.0), Token::Pow, Token::Value(3.0),
+                 Token::Minus, Token::Value(3.0), Token::Pow, Token::Value(4.0), Token::RightParentheses, Token::Plus,
+                 Token::Value(5.0), Token::RightParentheses, Token::Star, Token::Value(2.0), Token::RightParentheses,
+                 Token::Minus, Token::Value(10.0), Token::RightParentheses, Token::Exclamation, Token::Slash, Token::Value(4.0) ];
+
+    let tree = Tree::parse(x);
+    println!("((2-/((5^3-3^4)+5)*2)-10)! / 4 = 6 : {}",tree.calculate());
+
+    let x = vec![Token::LeftParentheses, Token::Value(2.0),
+                 Token::Sqrt, Token::LeftParentheses,Token::LeftParentheses,Token::Value(5.0), Token::Pow, Token::Value(3.0),
+                 Token::Minus, Token::Value(3.0), Token::Pow, Token::Value(4.0), Token::RightParentheses, Token::Plus,
+                 Token::Value(5.0), Token::RightParentheses, Token::Star, Token::Value(2.0), Token::RightParentheses,
+                 Token::Minus, Token::Value(10.0)];
+
+    let tree = Tree::parse(x);
+    println!("(2-/((5^3-3^4)+5)*2)-10 = 4 : {}",tree.calculate());
+
+    let x = vec![Token::Value(5.0), Token::Plus, Token::Value(5.0)];
+    let tree = Tree::parse(x);
+    println!("5 + 5 = 10 : {}",tree.calculate());
+
+    let x = vec![Token::Value(5.0), Token::Minus, Token::Value(5.0)];
+    let tree = Tree::parse(x);
+    println!("5 - 5 = 0 : {}",tree.calculate());
+
+    let x = vec![Token::Value(5.0), Token::Star, Token::Value(5.0)];
+    let tree = Tree::parse(x);
+    println!("5 * 5 = 25 : {}",tree.calculate());
+
+    let x = vec![Token::Value(5.0), Token::Slash, Token::Value(5.0)];
+    let tree = Tree::parse(x);
+    println!("5 / 5 = 1 : {}",tree.calculate());
+
+    let x = vec![Token::Value(5.0), Token::Pow, Token::Value(2.0)];
+    let tree = Tree::parse(x);
+    println!("5 / 2 = 25 : {}",tree.calculate());
+
+    let x = vec![Token::Value(2.0), Token::Sqrt, Token::Value(4.0)];
+    let tree = Tree::parse(x);
+    println!("2-/4 = 2 : {}",tree.calculate());
+
+    let x = vec![Token::Value(5.0), Token::Star, Token::Value(5.0), Token::Minus, Token::Value(5.0)];
+    let tree = Tree::parse(x);
+    println!("5 * 5 - 5 = 20 : {}",tree.calculate());
+
+    let x = vec![Token::Value(5.0), Token::Minus, Token::Value(5.0), Token::Star, Token::Value(5.0)];
+    let tree = Tree::parse(x);
+    println!("5 - 5 * 5 = -20 : {}",tree.calculate());
+
+    let x = vec![Token::LeftParentheses, Token::Value(5.0), Token::Minus, 
+    Token::Value(5.0), Token::RightParentheses, Token::Star, Token::Value(5.0)];
+    let tree = Tree::parse(x);
+    println!("(5 - 5) * 5 = 0 : {}",tree.calculate());
+
+    let x = vec![Token::LeftParentheses, Token::Value(5.0), Token::Plus, 
+    Token::Value(5.0), Token::RightParentheses, Token::Star, Token::Value(5.0)];
+    let tree = Tree::parse(x);
+    println!("(5 + 5) * 5 = 50 : {}",tree.calculate());
+
+    let x = vec![Token::Value(5.0), Token::Exclamation];
+    let tree = Tree::parse(x);
+    println!("5! = 120 : {}",tree.calculate());
+
+    let x = vec![ Token::Sin, Token::Value(90.0), Token::Plus, Token::Value(2.0)];
+    let tree = Tree::parse(x);
+    println!("sin(90) + 2 = 3 : {}",tree.calculate());
+
+    let x = vec![ Token::Cos, Token::Value(90.0), Token::Minus, Token::Value(2.0)];
+    let tree = Tree::parse(x);
+    println!("cos(90) - 2 = -2 : {}",tree.calculate());
+
+}

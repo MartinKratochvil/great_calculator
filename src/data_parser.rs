@@ -85,7 +85,7 @@ impl UnaryFunctions {
 }
 
 impl Tree {
-    fn parse(mut tokens: Vec<Token>) -> Tree {
+    pub fn parse(tokens: Vec<Token>) -> Tree {
         fn parse_addition(mut tokens_or_trees: Vec<TokenOrTree>) -> Tree {
             #[macro_export]
             macro_rules! parentheses {
@@ -106,10 +106,52 @@ impl Tree {
                 };
             }
             fn parentheses(
-                mut stack: &Vec<TokenOrTree>,
-                mut tokens_or_trees: &Vec<TokenOrTree>,
+                stack: &mut Vec<TokenOrTree>,
+                tokens_or_trees: &mut Vec<TokenOrTree>,
             ) -> TokenOrTree {
-                todo!()
+                let mut r_par_count = 1;
+                while let Some(token_or_tree) = tokens_or_trees.pop() {
+                    if r_par_count <=0 {
+                        break;
+                    }
+                    match &token_or_tree {
+                        TokenOrTree::Token { tok } => {
+                            match tok {
+                                Token::RightParentheses => {
+                                    r_par_count += 1;
+                                    stack.push(token_or_tree);
+                                }
+                                Token::LeftParentheses => {
+                                    let mut argument_for_recursive_calculation_of_parantheses = Vec::new();
+                                    while let Some(token_or_tree_from_stack) = stack.pop()  {
+                                        match &token_or_tree_from_stack {
+                                            TokenOrTree::Tree {..} => argument_for_recursive_calculation_of_parantheses.push(token_or_tree_from_stack),
+                                            TokenOrTree::Token { tok } =>{
+                                                match tok {
+                                                    Token::RightParentheses => {
+                                                        r_par_count -= 1;
+                                                        break;
+                                                    }
+                                                    _=> argument_for_recursive_calculation_of_parantheses.push(token_or_tree_from_stack),
+                                                }
+                                            }
+                                        }
+                                    }
+                                    stack.push(TokenOrTree::Tree{tree: parse_addition(argument_for_recursive_calculation_of_parantheses)});
+                                    
+                                }
+                                _=> stack.push(token_or_tree),
+                            }
+                        }
+                        TokenOrTree::Tree { .. } => {stack.push(token_or_tree)}
+                    };
+                }
+                if let Some(result_tree) = stack.pop() {
+                    result_tree
+                }
+                else {
+                    panic!()
+                }
             }
             enum States {
                 QLoop,
@@ -123,9 +165,9 @@ impl Tree {
             while let Some(token_or_tree) = tokens_or_trees.pop() {
                 match state {
                     States::QLoop => {
-                        match token_or_tree {
+                        match &token_or_tree {
                             //If tree push tree onto stack
-                            TokenOrTree::Tree { tree } => stack.push(token_or_tree),
+                            TokenOrTree::Tree { ..} => stack.push(token_or_tree),
                             //If token call ParsePower on the rest of imput and on the stack
                             TokenOrTree::Token { tok } => {
                                 match tok {
@@ -140,7 +182,7 @@ impl Tree {
                                     }
                                     Token::Minus => match tokens_or_trees.last() {
                                         Some(next) => match next {
-                                            TokenOrTree::Tree { tree } => {
+                                            TokenOrTree::Tree { .. } => {
                                                 stack.reverse();
                                                 return Tree::BinaryFunction {
                                                     kind: BinaryFunctions::Sub,
@@ -172,16 +214,16 @@ impl Tree {
                                     }
                                     //v, E->T(v)
                                     Token::Value(i) => stack.push(TokenOrTree::Tree {
-                                        tree: Tree::Value(i),
+                                        tree: Tree::Value(*i),
                                     }),
                                     //sin, T->sin(T)
                                     Token::Sin | Token::Cos => parentheses!(stack, tok),
                                     Token::RightParentheses => {
                                         stack.push(token_or_tree);
-                                        stack.push(parentheses(&stack, &tokens_or_trees));
+                                        let tree_from_parentheses = parentheses(&mut stack, &mut tokens_or_trees);
+                                        stack.push(tree_from_parentheses);
                                     }
                                     Token::Exclamation => {
-                                        stack.push(token_or_tree);
                                         state = States::Q2;
                                     }
                                     Token::LeftParentheses => panic!(),
@@ -190,31 +232,77 @@ impl Tree {
                         }
                     }
                     States::Q1 => {}
-                    States::Q2 => match token_or_tree {
-                        TokenOrTree::Tree { tree } => stack.push(token_or_tree),
-                        TokenOrTree::Token { tok } => match tok {
-                            Token::Value(i) => stack.push(TokenOrTree::Tree {
-                                tree: Tree::Value(i),
-                            }),
-                            Token::Plus => {}
-                            Token::Minus => {}
-                            Token::Star => {}
-                            Token::Slash => {}
-                            Token::Pow => {}
-                            Token::Sqrt => {}
-                            Token::Sin => {}
-                            Token::Cos => {}
-                            Token::Exclamation => {}
-                            Token::RightParentheses => {
+                    States::Q2 => {
+                        match &token_or_tree {
+                            TokenOrTree::Tree { .. } => {
                                 stack.push(token_or_tree);
-                                let tree_from_parentheses = parentheses(&stack, &tokens_or_trees);
-                                stack.push(tree_from_parentheses);
+                                //state = States::Q4;
+                            },
+                            TokenOrTree::Token { tok } => match tok {
+                                Token::Value(i) => {
+                                    stack.push(
+                                        TokenOrTree::Tree {
+                                            tree: Tree::Value(*i),
+                                        }
+                                    );
+                                    //state = States::Q4;
+                                }
+                                Token::RightParentheses => {
+                                    stack.push(token_or_tree);
+                                    let tree_from_parentheses = parentheses(&mut stack, &mut tokens_or_trees);
+                                    stack.push(tree_from_parentheses);
+                                    //state = States::Q4;
+                                }
+                                _=> panic!(),
+                            },
+
+                        
+                        }
+                        
+
+                        //this should be in Q4 but it requires not reading so
+                        //it is right behind Q2 since Q3 is in function and therefore it is reduces to transfer
+                        if let Some(tree_from_stack) = stack.pop(){
+                            match tree_from_stack {
+                                TokenOrTree::Tree {tree} => {
+                                    let arg = tree;
+                                    stack.push(
+                                        TokenOrTree::Tree {
+                                            tree : Tree::UnaryFunction {
+                                                kind: UnaryFunctions::Factorial, x : Box::new(arg)
+                                            }
+                                        }
+                                    )
+                                },
+                                TokenOrTree::Token {..} => panic!()
                             }
-                            Token::LeftParentheses => {}
-                        },
-                    },
+                        }
+                        else {
+                            panic!();
+                        }
+                        state = States::QLoop;
+                    }
                     States::Q3 => {}
-                    States::Q4 => {}
+                    States::Q4 => {
+                        if let Some(tree_from_stack) = stack.pop(){
+                            match tree_from_stack {
+                                TokenOrTree::Tree {tree} => {
+                                    let arg = tree;
+                                    stack.push(
+                                        TokenOrTree::Tree {
+                                            tree : Tree::UnaryFunction {
+                                                kind: UnaryFunctions::Factorial, x : Box::new(arg)
+                                            }
+                                        }
+                                    )
+                                },
+                                TokenOrTree::Token {..} => panic!()
+                            }
+                        }
+                        else {
+                            panic!();
+                        }
+                    }
                 }
             }
             stack.reverse();
@@ -222,11 +310,11 @@ impl Tree {
         }
 
         fn parse_multiplication(mut tokens_or_trees: Vec<TokenOrTree>) -> Tree {
-            let mut stack: Vec<TokenOrTree>;
+            let mut stack: Vec<TokenOrTree> = Vec::new();
             while let Some(token_or_tree) = tokens_or_trees.pop() {
-                match token_or_tree {
+                match &token_or_tree {
                     //If tree push tree onto stack
-                    TokenOrTree::Tree { tree } => stack.push(token_or_tree),
+                    TokenOrTree::Tree { .. } => stack.push(token_or_tree),
                     //If token call ParsePower on the rest of imput and on the stack
                     TokenOrTree::Token { tok } => match tok {
                         Token::Star | Token::Slash => {
@@ -247,11 +335,11 @@ impl Tree {
         }
 
         fn parse_power(mut tokens_or_trees: Vec<TokenOrTree>) -> Tree {
-            let mut stack: Vec<TokenOrTree>;
+            let mut stack: Vec<TokenOrTree> = Vec::new();
             while let Some(token_or_tree) = tokens_or_trees.pop() {
-                match token_or_tree {
+                match &token_or_tree {
                     //If tree push tree onto stack
-                    TokenOrTree::Tree { tree } => stack.push(token_or_tree),
+                    TokenOrTree::Tree { .. } => stack.push(token_or_tree),
                     //If token call ParsePower on the rest of imput and on the stack
                     TokenOrTree::Token { tok } => match tok {
                         Token::Pow | Token::Sqrt => {
@@ -267,10 +355,10 @@ impl Tree {
                 }
             }
             if stack.len() == 1 {
-                return match stack.pop().unwrap() {
+                match stack.pop().unwrap() {
                     TokenOrTree::Tree { tree } => tree,
                     _ => panic!(),
-                };
+                }
             } else {
                 panic!();
             }
@@ -279,7 +367,7 @@ impl Tree {
     }
 
     //Funkce pro vypočtení stromu Tree
-    fn calculate(&self) -> f64 {
+    pub fn calculate(&self) -> f64 {
         match self {
             Tree::BinaryFunction { kind, x, y } => kind.execute(x.calculate(), y.calculate()),
             Tree::UnaryFunction { kind, x } => kind.execute(x.calculate()),
@@ -319,3 +407,6 @@ impl TokenOrTree {
         tokens_or_trees
     }
 }
+
+
+
