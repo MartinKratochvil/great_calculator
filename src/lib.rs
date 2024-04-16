@@ -1,4 +1,6 @@
-#[cfg(test)]
+mod data_parser;
+
+
 /// Function requires two arguments of type f64
 ///
 /// returns arg1 + arg2
