@@ -1,4 +1,4 @@
-mod data_parser;
+pub mod data_parser;
 
 
 /// Function requires two arguments of type f64
@@ -206,7 +206,8 @@ mod test{
 }
 */
 
-
+#[test]
+#[cfg(test)]
 pub fn test_parser(){
     // ((2-/((5^3-3^4)+5)*2)-10)! / 4
     use data_parser::*;
@@ -217,7 +218,8 @@ pub fn test_parser(){
                  Token::Minus, Token::Value(10.0), Token::RightParentheses, Token::Exclamation, Token::Slash, Token::Value(4.0) ];
 
     let tree = Tree::parse(x);
-    println!("((2-/((5^3-3^4)+5)*2)-10)! / 4 = 6 : {}",tree.calculate());
+    //println!("((2-/((5^3-3^4)+5)*2)-10)! / 4 = 6 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), 6.0);
 
     let x = vec![Token::LeftParentheses, Token::Value(2.0),
                  Token::Sqrt, Token::LeftParentheses,Token::LeftParentheses,Token::Value(5.0), Token::Pow, Token::Value(3.0),
@@ -226,60 +228,73 @@ pub fn test_parser(){
                  Token::Minus, Token::Value(10.0)];
 
     let tree = Tree::parse(x);
-    println!("(2-/((5^3-3^4)+5)*2)-10 = 4 : {}",tree.calculate());
+    //println!("(2-/((5^3-3^4)+5)*2)-10 = 4 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), 4.0);
 
     let x = vec![Token::Value(5.0), Token::Plus, Token::Value(5.0)];
     let tree = Tree::parse(x);
-    println!("5 + 5 = 10 : {}",tree.calculate());
+    //println!("5 + 5 = 10 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), 10.0);
 
     let x = vec![Token::Value(5.0), Token::Minus, Token::Value(5.0)];
     let tree = Tree::parse(x);
-    println!("5 - 5 = 0 : {}",tree.calculate());
+    //println!("5 - 5 = 0 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), 0.0);
 
     let x = vec![Token::Value(5.0), Token::Star, Token::Value(5.0)];
     let tree = Tree::parse(x);
-    println!("5 * 5 = 25 : {}",tree.calculate());
+    //println!("5 * 5 = 25 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), 25.0);
 
     let x = vec![Token::Value(5.0), Token::Slash, Token::Value(5.0)];
     let tree = Tree::parse(x);
-    println!("5 / 5 = 1 : {}",tree.calculate());
+    //println!("5 / 5 = 1 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), 1.0);
 
     let x = vec![Token::Value(5.0), Token::Pow, Token::Value(2.0)];
     let tree = Tree::parse(x);
-    println!("5 / 2 = 25 : {}",tree.calculate());
+    //println!("5 ^ 2 = 25 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), 25.0);
 
     let x = vec![Token::Value(2.0), Token::Sqrt, Token::Value(4.0)];
     let tree = Tree::parse(x);
-    println!("2-/4 = 2 : {}",tree.calculate());
+    //println!("2-/4 = 2 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), 2.0);
 
     let x = vec![Token::Value(5.0), Token::Star, Token::Value(5.0), Token::Minus, Token::Value(5.0)];
     let tree = Tree::parse(x);
-    println!("5 * 5 - 5 = 20 : {}",tree.calculate());
+    //println!("5 * 5 - 5 = 20 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), 20.0);
 
     let x = vec![Token::Value(5.0), Token::Minus, Token::Value(5.0), Token::Star, Token::Value(5.0)];
     let tree = Tree::parse(x);
-    println!("5 - 5 * 5 = -20 : {}",tree.calculate());
+    //println!("5 - 5 * 5 = -20 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), -20.0);
 
     let x = vec![Token::LeftParentheses, Token::Value(5.0), Token::Minus, 
     Token::Value(5.0), Token::RightParentheses, Token::Star, Token::Value(5.0)];
     let tree = Tree::parse(x);
-    println!("(5 - 5) * 5 = 0 : {}",tree.calculate());
+    //println!("(5 - 5) * 5 = 0 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), 0.0);
 
     let x = vec![Token::LeftParentheses, Token::Value(5.0), Token::Plus, 
     Token::Value(5.0), Token::RightParentheses, Token::Star, Token::Value(5.0)];
     let tree = Tree::parse(x);
-    println!("(5 + 5) * 5 = 50 : {}",tree.calculate());
+    //println!("(5 + 5) * 5 = 50 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), 50.0);
 
     let x = vec![Token::Value(5.0), Token::Exclamation];
     let tree = Tree::parse(x);
-    println!("5! = 120 : {}",tree.calculate());
+    //println!("5! = 120 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), 120.0);
 
     let x = vec![ Token::Sin, Token::Value(90.0), Token::Plus, Token::Value(2.0)];
     let tree = Tree::parse(x);
-    println!("sin(90) + 2 = 3 : {}",tree.calculate());
+    //println!("sin(90) + 2 = 3 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), 3.0);
 
     let x = vec![ Token::Cos, Token::Value(90.0), Token::Minus, Token::Value(2.0)];
     let tree = Tree::parse(x);
-    println!("cos(90) - 2 = -2 : {}",tree.calculate());
-
+    //println!("cos(90) - 2 = -2 : {}",tree.calculate());
+    assert_eq!(tree.calculate(), -2.0);
 }

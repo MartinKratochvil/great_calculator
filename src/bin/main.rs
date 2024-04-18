@@ -1,6 +1,6 @@
-use great_calculator::*;
+use great_calculator::{data_parser::Tree, *};
 
 
 fn main() {
-    test_parser();
+    
 }
