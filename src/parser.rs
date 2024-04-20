@@ -1,5 +1,3 @@
-use std::fmt::write;
-
 use crate::{add, cos, div, fact, mul, pwr, sin, sqrt, sub};
 
 //Token které příjmá kalkulačka
