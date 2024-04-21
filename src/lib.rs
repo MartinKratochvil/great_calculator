@@ -1,3 +1,5 @@
+mod profiling;
+
 #[cfg(test)]
 /// Function requires two arguments of type f64
 ///
