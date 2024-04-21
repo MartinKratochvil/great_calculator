@@ -1,4 +1,4 @@
-use crate::{add, cos, div, fact, mul, pwr, sin, sqrt, sub};
+use crate::our_math_lib::{add, cos, div, fact, mul, pwr, sin, sqrt, sub};
 
 //Token které příjmá kalkulačka
 #[derive(Clone)]
@@ -397,10 +397,10 @@ impl Tree {
             if stack.len() == 1 {
                 match stack.pop().unwrap() {
                     TokenOrTree::Tree { tree } => Ok(tree),
-                    _ => return Err(ErrorCalls::WTF), //wtf
+                    _ => Err(ErrorCalls::WTF), //wtf
                 }
             } else {
-                return Err(ErrorCalls::UnconectedValues); //Values without functions
+                Err(ErrorCalls::UnconectedValues) //Values without functions
             }
         }
 
