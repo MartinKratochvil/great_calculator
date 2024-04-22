@@ -6,7 +6,7 @@
 
 use std::{io};
 use std::io::BufRead;
-use great_calculator::our_math_lib::{div, mul, pwr, sqrt, sub};
+use great_calculator::our_math_lib::{add, div, mul, pwr, sqrt, sub};
 
 
 fn main(){
@@ -15,14 +15,14 @@ fn main(){
 
     let mut sum = 0.0;
     let mut sum_of_powers:f64 = 0.0;
-    let mut count = 0;            //initialization of variables
+    let mut count = 0.0;            //initialization of variables
 
     while let Some(line)= lines.next() { //while there are any lines left
         for str_number in line.unwrap().split_whitespace() {  //for every number on line
             let number: f64 = str_number.parse().unwrap();  //cast the string into float
-            count += 1;
-            sum += number;
-            sum_of_powers += pwr(number,2.0);
+            count =add (count,1.0);
+            sum = add(sum,number);
+            sum_of_powers = add(sum_of_powers, pwr(number,2.0));
 
             //println!("{}",number);
         }
