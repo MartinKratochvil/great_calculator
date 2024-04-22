@@ -240,34 +240,44 @@ fn get_token_from_str(str: String) -> Token {
 fn build_ui() -> impl Widget<Calculator> {
     let display = Label::new(|data: &Calculator, _env: &_| format!("{}", data.display))
         .with_text_size(64.0)
-        .padding(40.0)
-        .align_right();
+        .align_right()
+        .fix_height(150.0)
+        .expand_width()
+        .padding(20.0);
 
     let mut col = Flex::column();
-    col.add_child(display.padding(3.0));
+    col.add_flex_child(display, 2.0);
 
-    let buttons = ["7", "8", "9", "/", "⌫",
-        "4", "5", "6", "*", "CE",
-        "1", "2", "3", "-", "C",
-        "%", "0", ".", "+", "="];
+    let buttons = [
+        "sin", "cos", "!", "C", "⌫",
+         "7",   "8",  "9", "^", "√",
+         "4",   "5",  "6", "*", "/",
+         "1",   "2",  "3", "+", "-",
+         ".",   "0",  "(", ")", "=", "HELP"
+    ];
+
     let mut grid = Flex::row().cross_axis_alignment(CrossAxisAlignment::Start);
 
     for (index, button) in buttons.iter().enumerate() {
         let button_label = button.to_string();
         let button = Button::new(*button)
-
             .on_click(move |_ctx, data: &mut Calculator, _env| {
-                data.display.push_str(&button_label);
-            });
+                match button_label.as_str() {
+                    "C" => { data.display.clear(); },
+                    "⌫" => { data.display.pop(); },
+                    _ => { data.display.push_str(&button_label); },
+                }
+            })
+            .expand();
 
         if index % 5 == 0 && index != 0 {
-            col.add_child(grid);
+            col.add_flex_child(grid, 1.0);
             grid = Flex::row().cross_axis_alignment(CrossAxisAlignment::Start);
         }
 
-        grid.add_flex_child(button.expand_width().fix_height(80.0).padding(2.0), 1.0);
+        grid.add_flex_child(button.padding(2.0), 1.0);
     }
 
-    col.add_flex_child(grid,1.0);
+    col.add_flex_child(grid, 1.0);
     col
 }
