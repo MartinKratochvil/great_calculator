@@ -7,3 +7,4 @@ opt-level = 3
 
 [dependencies]
 druid = "0.8.3"
+indexmap = "2.2.6"
