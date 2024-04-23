@@ -236,15 +236,3 @@ fn get_token_from_str(str: String) -> Token {
         _ => Token::Value(f64::NAN)
     }
 }
-
-fn is_binary_token(token: Token) -> bool {
-    match token {
-        Token::Pow => true,
-        Token::Sqrt => true,
-        Token::Star => true,
-        Token::Slash => true,
-        Token::Plus => true,
-        Token::Minus => true,
-        _ => false
-    }
-}
