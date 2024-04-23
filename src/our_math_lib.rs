@@ -3,7 +3,7 @@
 //! A math library for our calculator.
 
 /// Addition of two numbers
-///
+///#
 /// Function requires two arguments of type f64
 ///
 /// `returns` arg1 + arg2
@@ -22,7 +22,7 @@ pub fn add(left: f64, right: f64) -> f64{
 }
 
 /// Subtraction of two numbers
-///
+///#
 /// Function requires two arguments of type f64
 ///
 /// `returns` arg1 - arg2
@@ -34,6 +34,7 @@ pub fn add(left: f64, right: f64) -> f64{
 /// let y = 16.0;
 /// let result = sub(x,y);
 /// assert_eq!(result,20.0);
+///
 /// assert_eq!(sub(20.0,13.0), 7.0);
 /// ```
 pub fn sub(left: f64, right: f64) -> f64{
@@ -41,7 +42,7 @@ pub fn sub(left: f64, right: f64) -> f64{
 }
 
 /// Multiplication of two numbers
-///
+///#
 /// Function requires two arguments of type f64
 ///
 /// `returns` arg1 * arg2
@@ -53,6 +54,7 @@ pub fn sub(left: f64, right: f64) -> f64{
 /// let y = 10.0;
 /// let result = mul(x,y);
 /// assert_eq!(result,150.0);
+///
 /// let result = mul(y,x);
 /// assert_eq!(result,150.0);
 /// ```
@@ -61,7 +63,7 @@ pub fn mul(left: f64, right:f64) -> f64{
 }
 
 /// Division of two numbers
-///
+///#
 /// Function requires two arguments of type f64
 ///
 /// `returns` arg1 / arg2
@@ -73,10 +75,13 @@ pub fn mul(left: f64, right:f64) -> f64{
 /// let y = 10.0;
 /// let result = div(x,y);
 /// assert_eq!(result,4.0);
+///
 /// let result = div(y,x);
 /// assert_eq!(result,0.25);
+///
 /// let result = div(x,x);
 /// assert_eq!(result,1.0);
+///
 /// let x = 40.0;
 /// let y = 0.0;
 /// let result = div(x,y);
@@ -92,7 +97,7 @@ pub fn div(left: f64, right:f64) -> f64{
 }
 
 /// N-th power of a number
-///
+///#
 /// Function requires two arguments of type f64
 ///
 /// `returns` x^{n}
@@ -104,14 +109,18 @@ pub fn div(left: f64, right:f64) -> f64{
 /// let y = 5.0;
 /// let result = pwr(x,y);
 /// assert_eq!(result,32.0);
+///
 /// let result = pwr(y,x);
 /// assert_eq!(result,25.0);
+///
 /// let x = 10.0;
 /// let y = 5.0;
 /// let result = pwr(y,x);
 /// assert_eq!(result,9765625.0);
+///
 /// let result = pwr(x,y);
 /// assert_eq!(result,100000.0);
+///
 /// let x = 5.0;
 /// let y = 0.0;
 /// let result = pwr(x,y);
@@ -122,6 +131,8 @@ pub fn pwr(x: f64, n:f64) -> f64{
 }
 
 /// N-th root of a number
+///#
+/// Function requires two arguments of type f64
 ///
 /// `returns` n-th root of x
 ///
@@ -132,13 +143,17 @@ pub fn pwr(x: f64, n:f64) -> f64{
 /// let x = 16.0;
 /// let result = sqrt(x,n);
 /// assert_eq!(result,4.0);
+///
 /// let x = 256.0;
+/// let n = 2.0;
 /// let result = sqrt(x,n);
 /// assert_eq!(result,16.0);
+///
 /// let x = 4096.0;
 /// let n = 4.0;
 /// let result = sqrt(x,n);
 /// assert_eq!(result,8.0);
+///
 /// let x = 27.0;
 /// let n = 3.0;
 /// let result = sqrt(x,n);
@@ -149,7 +164,7 @@ pub fn sqrt(x: f64, n:f64) -> f64{
 }
 
 /// Factorial of a number
-///
+///#
 /// Function requires one argument of type f64
 ///
 /// `returns` x!
@@ -160,12 +175,15 @@ pub fn sqrt(x: f64, n:f64) -> f64{
 /// let x = 3.0;
 /// let result = fact(x);
 /// assert_eq!(result,6.0);
+///
 /// let x = 5.0;
 /// let result = fact(x);
 /// assert_eq!(result,120.0);
+///
 /// let x = 10.0;
 /// let result = fact(x);
 /// assert_eq!(result,3628800.0);
+///
 /// let x = 1.0;
 /// let result = fact(x);
 ///  assert_eq!(result,1.0);
@@ -179,7 +197,7 @@ pub fn fact(x: f64) -> f64{  //Counts factorial using recursion
 }
 
 /// Sine of a number
-///
+///#
 /// Function requires one argument of type f64
 ///
 /// `returns` sin(x)
@@ -190,13 +208,16 @@ pub fn fact(x: f64) -> f64{  //Counts factorial using recursion
 /// let x = 0.0;
 /// let result = sin(x);
 /// assert_eq!(result,0.0);
+///
 /// let x = 90.0;
 /// let result = sin(x);
 /// assert_eq!(result,1.0);
+///
 /// let x = 45.0;
 /// let result = sin(x);
 /// let refresult = f64::sin(f64::to_radians(x));
 /// assert_eq!(result,refresult);
+///
 /// let x = 60.0;
 /// let refresult = f64::sin(f64::to_radians(x));
 /// let result = sin(x);
@@ -213,7 +234,7 @@ pub fn sin(x: f64) -> f64{
 }
 
 /// Cosine of a number
-///
+///#
 /// Function requires one argument of type f64
 ///
 /// `returns` cos(x)
