@@ -1,5 +1,4 @@
 use indexmap::IndexMap;
-use std::collections::{HashMap};
 use std::sync::{Arc, Mutex};
 use druid::widget::{Button, Flex, Label};
 use druid::{AppLauncher, Data, Env, EventCtx, Widget, WidgetExt, WindowDesc};
@@ -71,52 +70,71 @@ fn main() {
 }
 
 
+#[allow(unused_variables)]
 fn handle_number(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     if let Some(digit) = label.chars().last() {
         num_buff.push(digit);
+        println!("add: {}", label);
         //TODO: print digit
     }
 }
 
+#[allow(unused_variables)]
 fn handle_point(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     if let Some(dec_point) = label.chars().last() {
         if !num_buff.contains(dec_point) {
             num_buff.push(dec_point);
+            println!("add: {}", label);
             //TODO: print dot
         }
     }
 }
 
 fn handle_binary_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-    push_num_buff(tokens, num_buff);
-    tokens.push(get_token_from_str(label));
+    if push_num_buff(tokens, num_buff) {
+        println!("push: {}", label.as_str());
+        tokens.push(get_token_from_str(label));
+        //TODO: print operation
+    }
 }
 
 fn handle_minus(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-    push_num_buff(tokens, num_buff);
-    tokens.push(get_token_from_str(label));
+    if push_num_buff(tokens, num_buff) {
+        println!("push: {}", label.as_str());
+        tokens.push(get_token_from_str(label));
+        //TODO: print operation
+    }
 }
 
 fn handle_gon_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     push_num_buff(tokens, num_buff);
+    println!("push: {}", label);
     tokens.push(get_token_from_str(label));
+    //TODO: print gon func
 }
 
 fn handle_factorial(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     push_num_buff(tokens, num_buff);
+    println!("push: {}", label);
     tokens.push(get_token_from_str(label));
+    //TODO: print factorial
 }
 
 fn handle_open_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     push_num_buff(tokens, num_buff);
+    println!("push: {}", label);
     tokens.push(get_token_from_str(label));
+    //TODO: print bracket
 }
 
 fn handle_close_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     push_num_buff(tokens, num_buff);
+    println!("push: {}", label);
     tokens.push(get_token_from_str(label));
+    //TODO: print bracket
 }
 
+#[allow(unused_variables)]
 fn handle_delete(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     if !num_buff.is_empty() {
         num_buff.clear();
@@ -128,14 +146,27 @@ fn handle_delete(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) 
     //Todo: remove last item
 }
 
+#[allow(unused_variables)]
 fn handle_clear(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     tokens.clear();
     //Todo: clear list
 }
-
+#[allow(unused_variables)]
 fn handle_calculate(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     println!("numbuff: {} - tokens: {}", num_buff, tokens.len());
-    //Todo: call parser and print result
+    push_num_buff(tokens, num_buff);
+    match Tree::parse(tokens.clone()) {
+        Ok(tree) => {
+            let ans = tree.calculate();
+            println!("ANS: {}", ans);
+            //Todo: print answer
+        }
+        Err(er) => {
+            println!("ERROR!!!{}", er.to_string());
+            //Todo: print error
+        }
+    }
+    tokens.clear();
 }
 
 
@@ -182,5 +213,17 @@ fn get_token_from_str(str: String) -> Token {
         "(" => Token::LeftParentheses,
         ")" => Token::RightParentheses,
         _ => Token::Value(f64::NAN)
+    }
+}
+
+fn is_binary_token(token: Token) -> bool {
+    match token {
+        Token::Pow => true,
+        Token::Sqrt => true,
+        Token::Star => true,
+        Token::Slash => true,
+        Token::Plus => true,
+        Token::Minus => true,
+        _ => false
     }
 }
