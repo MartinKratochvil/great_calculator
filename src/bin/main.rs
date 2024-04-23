@@ -1,22 +1,17 @@
-use std::cell::RefCell;
 use indexmap::IndexMap;
 use std::collections::{HashMap};
+use std::sync::{Arc, Mutex};
 use druid::widget::{Button, Flex, Label};
 use druid::{AppLauncher, Data, Env, EventCtx, Widget, WidgetExt, WindowDesc};
 use great_calculator::parser::{Token, Tree};
 
 
-type InputHandler = fn(&mut [Token], String);
-type Swag = fn(&mut Token);
+type InputHandler = fn(&mut Vec<Token>, &mut String, String);
 static COLUMNS: i32 = 5;
 
 
 fn main() {
-    /*let mut s = Token::Sin;
-    fn swag_impl(token: &mut Token) {
 
-    }
-    swag_impl(&mut s);*/
     let event_map: IndexMap<String, InputHandler> = IndexMap::from([
         ("sin".to_string(), handle_gon_func as InputHandler),
         ("cos".to_string(), handle_gon_func as InputHandler),
@@ -63,15 +58,19 @@ fn main() {
         (")".to_string(), Token::RightParentheses)
     ]);
 
-    let tokens = RefCell::new(Vec::new());
+    let tokens = Arc::new(Mutex::new(Vec::new()));
+    let num_buff = Arc::new(Mutex::new(String::new()));
 
     //enjoy this abomination :)
     let mut dynamic_buttons = Flex::column();
     for (key, func) in event_map {
-        let tokens_ref = tokens.clone();
+        let tokens_clone = Arc::clone(&tokens);
+        let num_buff_clone = Arc::clone(&num_buff);
         let button = Button::new(key.clone())
             .on_click(move |_, _, _| {
-                func(&mut tokens_ref.borrow_mut(), key.clone());
+                let mut tokens_lock = tokens_clone.lock().unwrap();
+                let mut num_lock = num_buff_clone.lock().unwrap();
+                func(&mut tokens_lock, &mut num_lock, key.clone());
             });
         dynamic_buttons.add_child(button);
     }
@@ -86,48 +85,71 @@ fn main() {
     //finally end of this hell
 
 
-    fn handle_number(tokens: &mut [Token], label: String) {
-        println!("Function handle_number called with label: {}", label);
+    fn handle_number(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
+        match label.parse::<i32>() {
+            Ok(num) => {
+                println!("pressed: {}", num.to_string());
+
+                if let Some(Token::Value(mut value)) = tokens.last() {
+                    tokens.pop();
+                    println!("Last value is: {}", value);
+
+                    value *= 10f64;
+                    value += num as f64;
+                    tokens.push(Token::Value(value));
+
+                    println!("New value is: {}", value);
+
+                }
+                else {
+                    tokens.push(Token::Value(num as f64));
+                    println!("Not a Value variant");
+                }
+            }
+            Err(err) => {
+                panic!("{}", err.to_string());
+            }
+        }
+        println!("size: {}", tokens.len());
     }
 
-    fn handle_point(tokens: &mut [Token], label: String) {
+    fn handle_point(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
         println!("Function handle_point called with label: {}", label);
     }
 
-    fn handle_binary_func(tokens: &mut [Token], label: String) {
+    fn handle_binary_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
         println!("Function handle_binary_func called with label: {}", label);
     }
 
-    fn handle_minus(tokens: &mut [Token], label: String) {
+    fn handle_minus(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
         println!("Function handle_minus called with label: {}", label);
     }
 
-    fn handle_gon_func(tokens: &mut [Token], label: String) {
-        // Since we can't push to an array slice, this functionality is disabled
+    fn handle_gon_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
         println!("Function handle_gon_func called with label: {}", label);
     }
 
-    fn handle_factorial(tokens: &mut [Token], label: String) {
+    fn handle_factorial(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
         println!("Function handle_factorial called with label: {}", label);
     }
 
-    fn handle_open_bracket(tokens: &mut [Token], label: String) {
+    fn handle_open_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
         println!("Function handle_open_bracket called with label: {}", label);
     }
 
-    fn handle_close_bracket(tokens: &mut [Token], label: String) {
+    fn handle_close_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
         println!("Function handle_close_bracket called with label: {}", label);
     }
 
-    fn handle_delete(tokens: &mut [Token], label: String) {
+    fn handle_delete(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
         println!("Function handle_delete called with label: {}", label);
     }
 
-    fn handle_clear(tokens: &mut [Token], label: String) {
+    fn handle_clear(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
         println!("Function handle_clear called with label: {}", label);
     }
 
-    fn handle_calculate(tokens: &mut [Token], label: String) {
+    fn handle_calculate(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
         println!("Function handle_calculate called with label: {}", label);
     }
 
