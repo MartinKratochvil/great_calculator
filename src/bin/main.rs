@@ -241,12 +241,15 @@ fn build_ui() -> impl Widget<Calculator> {
     let display = Label::new(|data: &Calculator, _env: &_| format!("{}", data.display))
         .with_text_size(64.0)
         .align_right()
-        .fix_height(150.0)
-        .expand_width()
-        .padding(20.0);
+        .expand_width();
+
+    let display_container = Container::new(display)
+        .fix_height(90.0)
+        .padding(20.0)
+        .background(Color::rgb8(24,119,242));
 
     let mut col = Flex::column();
-    col.add_flex_child(display, 2.0);
+    col.add_child(display_container);
 
     let buttons = [
         "sin", "cos", "!", "C", "⌫",
@@ -256,7 +259,7 @@ fn build_ui() -> impl Widget<Calculator> {
          ".",   "0",  "(", ")", "=", "HELP"
     ];
 
-    let mut grid = Flex::row().cross_axis_alignment(CrossAxisAlignment::Start);
+    let mut button_grid = Flex::row().cross_axis_alignment(CrossAxisAlignment::Start);
 
     for (index, button) in buttons.iter().enumerate() {
         let button_label = button.to_string();
@@ -268,16 +271,17 @@ fn build_ui() -> impl Widget<Calculator> {
                     _ => { data.display.push_str(&button_label); },
                 }
             })
+            .border(Color::rgb8(24,119,242), 1.0)
             .expand();
 
         if index % 5 == 0 && index != 0 {
-            col.add_flex_child(grid, 1.0);
-            grid = Flex::row().cross_axis_alignment(CrossAxisAlignment::Start);
+            col.add_flex_child(button_grid, 1.0);
+            button_grid = Flex::row().cross_axis_alignment(CrossAxisAlignment::Start);
         }
 
-        grid.add_flex_child(button.padding(2.0), 1.0);
+        button_grid.add_flex_child(button.padding(2.0).background(Color::BLACK), 1.0);
     }
 
-    col.add_flex_child(grid, 1.0);
+    col.add_flex_child(button_grid, 1.0);
     col
 }
