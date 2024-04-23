@@ -10,7 +10,6 @@ pub fn test_parser(){
                  Token::Minus, Token::Value(3.0), Token::Pow, Token::Value(4.0), Token::RightParentheses, Token::Plus,
                  Token::Value(5.0), Token::RightParentheses, Token::Star, Token::Value(2.0), Token::RightParentheses,
                  Token::Minus, Token::Value(10.0), Token::RightParentheses, Token::Exclamation, Token::Slash, Token::Value(4.0) ];
-
     let tree;
     if let Ok(a) = Tree::parse(x){
         tree = a;
@@ -18,6 +17,7 @@ pub fn test_parser(){
     else {
         panic!();
     }
+
     //println!("((2-/((5^3-3^4)+5)*2)-10)! / 4 = 6 : {}",tree.calculate());
     assert_eq!(tree.calculate(), 6.0);
 
