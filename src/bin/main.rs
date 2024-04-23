@@ -11,7 +11,6 @@ static COLUMNS: i32 = 5;
 
 
 fn main() {
-
     let event_map: IndexMap<String, InputHandler> = IndexMap::from([
         ("sin".to_string(), handle_gon_func as InputHandler),
         ("cos".to_string(), handle_gon_func as InputHandler),
@@ -83,76 +82,87 @@ fn main() {
         .launch(())
         .expect("Failed to launch application");
     //finally end of this hell
+}
 
 
-    fn handle_number(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-        match label.parse::<i32>() {
-            Ok(num) => {
-                println!("pressed: {}", num.to_string());
+fn handle_number(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
+    if let Some(digit) = label.chars().last() {
+        num_buff.push(digit);
+        //TODO: print digit
+    }
+}
 
-                if let Some(Token::Value(mut value)) = tokens.last() {
-                    tokens.pop();
-                    println!("Last value is: {}", value);
-
-                    value *= 10f64;
-                    value += num as f64;
-                    tokens.push(Token::Value(value));
-
-                    println!("New value is: {}", value);
-
-                }
-                else {
-                    tokens.push(Token::Value(num as f64));
-                    println!("Not a Value variant");
-                }
-            }
-            Err(err) => {
-                panic!("{}", err.to_string());
-            }
+fn handle_point(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
+    if let Some(dec_point) = label.chars().last() {
+        if !num_buff.contains(dec_point) {
+            num_buff.push(dec_point);
+            //TODO: print dot
         }
-        println!("size: {}", tokens.len());
+    }
+}
+
+fn handle_binary_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
+    push_num_buff(tokens, num_buff);
+}
+
+fn handle_minus(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
+    push_num_buff(tokens, num_buff);
+}
+
+fn handle_gon_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
+    push_num_buff(tokens, num_buff);
+}
+
+fn handle_factorial(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
+    push_num_buff(tokens, num_buff);
+}
+
+fn handle_open_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
+    push_num_buff(tokens, num_buff);
+}
+
+fn handle_close_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
+    push_num_buff(tokens, num_buff);
+}
+
+fn handle_delete(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
+    push_num_buff(tokens, num_buff);
+}
+
+fn handle_clear(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
+    push_num_buff(tokens, num_buff);
+}
+
+fn handle_calculate(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
+    println!("numbuff: {} - tokens: {}", num_buff, tokens.len());
+}
+
+fn push_num_buff(tokens: &mut Vec<Token>, num_buff: &mut String) -> bool {
+    if num_buff.is_empty() {
+        return false;
     }
 
-    fn handle_point(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-        println!("Function handle_point called with label: {}", label);
+    if !num_buff.contains('.') {
+        num_buff.push_str(".0");
+    }
+    if let Some(last_char) = num_buff.chars().last() {
+        if last_char == '.' {
+            num_buff.push('0');
+        }
     }
 
-    fn handle_binary_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-        println!("Function handle_binary_func called with label: {}", label);
+    match num_buff.parse::<f64>() {
+        Ok(number) => {
+            tokens.push(Token::Value(number));
+            num_buff.clear();
+            return true;
+        }
+        Err(err) => {
+            println!("Failed to parse: {}", err);
+            num_buff.clear();
+            return false;
+        }
     }
-
-    fn handle_minus(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-        println!("Function handle_minus called with label: {}", label);
-    }
-
-    fn handle_gon_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-        println!("Function handle_gon_func called with label: {}", label);
-    }
-
-    fn handle_factorial(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-        println!("Function handle_factorial called with label: {}", label);
-    }
-
-    fn handle_open_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-        println!("Function handle_open_bracket called with label: {}", label);
-    }
-
-    fn handle_close_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-        println!("Function handle_close_bracket called with label: {}", label);
-    }
-
-    fn handle_delete(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-        println!("Function handle_delete called with label: {}", label);
-    }
-
-    fn handle_clear(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-        println!("Function handle_clear called with label: {}", label);
-    }
-
-    fn handle_calculate(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-        println!("Function handle_calculate called with label: {}", label);
-    }
-
 }
 
 
