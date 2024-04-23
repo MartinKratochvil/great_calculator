@@ -43,20 +43,6 @@ fn main() {
         ("=".to_string(), handle_calculate as InputHandler)
     ]);
 
-    let token_map: HashMap<String, Token> = HashMap::from([
-        ("sin".to_string(), Token::Sin),
-        ("cos".to_string(), Token::Cos),
-        ("!".to_string(), Token::Exclamation),
-        ("^".to_string(), Token::Pow),
-        ("√".to_string(), Token::Sqrt),
-        ("*".to_string(), Token::Star),
-        ("/".to_string(), Token::Slash),
-        ("+".to_string(), Token::Plus),
-        ("-".to_string(), Token::Minus),
-        ("(".to_string(), Token::LeftParentheses),
-        (")".to_string(), Token::RightParentheses)
-    ]);
-
     let tokens = Arc::new(Mutex::new(Vec::new()));
     let num_buff = Arc::new(Mutex::new(String::new()));
 
@@ -103,39 +89,55 @@ fn handle_point(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
 
 fn handle_binary_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     push_num_buff(tokens, num_buff);
+    tokens.push(get_token_from_str(label));
 }
 
 fn handle_minus(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     push_num_buff(tokens, num_buff);
+    tokens.push(get_token_from_str(label));
 }
 
 fn handle_gon_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     push_num_buff(tokens, num_buff);
+    tokens.push(get_token_from_str(label));
 }
 
 fn handle_factorial(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     push_num_buff(tokens, num_buff);
+    tokens.push(get_token_from_str(label));
 }
 
 fn handle_open_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     push_num_buff(tokens, num_buff);
+    tokens.push(get_token_from_str(label));
 }
 
 fn handle_close_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     push_num_buff(tokens, num_buff);
+    tokens.push(get_token_from_str(label));
 }
 
 fn handle_delete(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-    push_num_buff(tokens, num_buff);
+    if !num_buff.is_empty() {
+        num_buff.clear();
+
+        return;
+    }
+
+    tokens.pop();
+    //Todo: remove last item
 }
 
 fn handle_clear(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-    push_num_buff(tokens, num_buff);
+    tokens.clear();
+    //Todo: clear list
 }
 
 fn handle_calculate(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     println!("numbuff: {} - tokens: {}", num_buff, tokens.len());
+    //Todo: call parser and print result
 }
+
 
 fn push_num_buff(tokens: &mut Vec<Token>, num_buff: &mut String) -> bool {
     if num_buff.is_empty() {
@@ -151,19 +153,34 @@ fn push_num_buff(tokens: &mut Vec<Token>, num_buff: &mut String) -> bool {
         }
     }
 
-    match num_buff.parse::<f64>() {
+    return match num_buff.parse::<f64>() {
         Ok(number) => {
             tokens.push(Token::Value(number));
             num_buff.clear();
-            return true;
+            true
         }
         Err(err) => {
             println!("Failed to parse: {}", err);
             num_buff.clear();
-            return false;
+            false
         }
     }
 }
 
 
-
+fn get_token_from_str(str: String) -> Token {
+    match str.as_str() {
+        "sin" => Token::Sin,
+        "cos" => Token::Cos,
+        "!" => Token::Exclamation,
+        "^" => Token::Pow,
+        "√" => Token::Sqrt,
+        "*" => Token::Star,
+        "/" => Token::Slash,
+        "+" => Token::Plus,
+        "-" => Token::Minus,
+        "(" => Token::LeftParentheses,
+        ")" => Token::RightParentheses,
+        _ => Token::Value(f64::NAN)
+    }
+}

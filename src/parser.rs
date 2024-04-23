@@ -155,7 +155,7 @@ impl Tree {
                                     let mut argument_for_recursive_calculation_of_parantheses = Vec::new();
                                     //We pop everything from stack until we find leftParenthesies token then we call parse_addtion
                                     //with everithing we popped
-                                    while let Some(token_or_tree_from_stack) = stack.pop()  {
+                                    while let Some(token_or_tree_from_stack) = stack.pop() {
                                         match &token_or_tree_from_stack {
                                             TokenOrTree::Tree {..} => argument_for_recursive_calculation_of_parantheses.push(token_or_tree_from_stack),
                                             TokenOrTree::Token { tok } =>{
