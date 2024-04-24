@@ -1,4 +1,4 @@
 xhodakj00 100 (Testy k mat. knihovně + knihovna, Profiling,Věci okolo)
-xmatejj00 100 (GUI)
-xkratom00 100 (Zpracování frontendu)
-xottmat00 100 (Zpracování backendu)
+xmatejj00 110 (Design GUI, UX)
+xkratom00 95 (Zpracování lexikální analýzy, komunikace GUI s parser.rs)
+xottmat00 95 (Zpracování parser.rs ... syntaktická analýza)
