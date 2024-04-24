@@ -1,13 +1,17 @@
 use indexmap::IndexMap;
 use std::sync::{Arc, Mutex};
-use druid::widget::{Button, Flex, Label};
-use druid::{AppLauncher, Data, Env, EventCtx, Widget, WidgetExt, WindowDesc};
+use druid::widget::{Button, Flex, Label, CrossAxisAlignment, Container};
+use druid::{AppLauncher, WidgetExt, WindowDesc, Color, Data, Lens};
 use great_calculator::parser::{Token, Tree};
 
 
 type InputHandler = fn(&mut Vec<Token>, &mut String, String);
 static COLUMNS: i32 = 5;
 
+#[derive(Clone, Data, Lens)]
+struct Calculator {
+    display: String,
+}
 
 fn main() {
     let event_map: IndexMap<String, InputHandler> = IndexMap::from([
@@ -42,33 +46,64 @@ fn main() {
         ("=".to_string(), handle_calculate as InputHandler)
     ]);
 
+    let display = Label::new(|data: &Calculator, _env: &_| format!("{}", data.display))
+        .with_text_size(64.0)
+        .align_right()
+        .expand_width();
+
+    let display_container = Container::new(display)
+        .fix_height(90.0)
+        .padding(20.0)
+        .background(Color::rgb8(24,119,242));
+
+    let mut col = Flex::column();
+    col.add_child(display_container);
+
+    let mut button_grid = Flex::row().cross_axis_alignment(CrossAxisAlignment::Start);
+
     let tokens = Arc::new(Mutex::new(Vec::new()));
     let num_buff = Arc::new(Mutex::new(String::new()));
+    let mut index = 1;
 
-    //enjoy this abomination :)
-    let mut dynamic_buttons = Flex::column();
     for (key, func) in event_map {
         let tokens_clone = Arc::clone(&tokens);
         let num_buff_clone = Arc::clone(&num_buff);
         let button = Button::new(key.clone())
-            .on_click(move |_, _, _| {
+            .on_click(move |_ctx, data: &mut Calculator, _env| {
                 let mut tokens_lock = tokens_clone.lock().unwrap();
                 let mut num_lock = num_buff_clone.lock().unwrap();
                 func(&mut tokens_lock, &mut num_lock, key.clone());
-            });
-        dynamic_buttons.add_child(button);
+                reload_display(&mut tokens_lock, data);
+            })
+            .border(Color::rgb8(24,119,242), 1.0)
+            .expand();
+
+        button_grid.add_flex_child(button.padding(2.0).background(Color::BLACK), 1.0);
+
+        if index == COLUMNS {
+            index = 0;
+            col.add_flex_child(button_grid, 1.0);
+            button_grid = Flex::row().cross_axis_alignment(CrossAxisAlignment::Start);
+        }
+
+        index += 1;
     }
 
-    let window = WindowDesc::new(dynamic_buttons)
-        .window_size((400.0, 500.0))
+
+
+    let window = WindowDesc::new(col)
+        .window_size((400.0, 600.0))
         .title("GGC - Great calculator");
 
-    AppLauncher::with_window(window)
-        .launch(())
-        .expect("Failed to launch application");
-    //finally end of this hell
-}
+    let calculator = Calculator {
+        display: String::from(""),
+    };
 
+    AppLauncher::with_window(window)
+        .launch(calculator)
+        .expect("Failed to launch application");
+
+}
 
 #[allow(unused_variables)]
 fn handle_number(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
@@ -172,6 +207,7 @@ fn handle_clear(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     tokens.clear();
     //Todo: clear list
 }
+
 #[allow(unused_variables)]
 fn handle_calculate(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     println!("numbuff: {} - tokens: {}", num_buff, tokens.len());
@@ -189,7 +225,6 @@ fn handle_calculate(tokens: &mut Vec<Token>, num_buff: &mut String, label: Strin
     }
     tokens.clear();
 }
-
 
 fn push_num_buff(tokens: &mut Vec<Token>, num_buff: &mut String) -> bool {
     if num_buff.is_empty() {
@@ -219,7 +254,6 @@ fn push_num_buff(tokens: &mut Vec<Token>, num_buff: &mut String) -> bool {
     }
 }
 
-
 fn get_token_from_str(str: String) -> Token {
     match str.as_str() {
         "sin" => Token::Sin,
@@ -237,51 +271,7 @@ fn get_token_from_str(str: String) -> Token {
     }
 }
 
-fn build_ui() -> impl Widget<Calculator> {
-    let display = Label::new(|data: &Calculator, _env: &_| format!("{}", data.display))
-        .with_text_size(64.0)
-        .align_right()
-        .expand_width();
 
-    let display_container = Container::new(display)
-        .fix_height(90.0)
-        .padding(20.0)
-        .background(Color::rgb8(24,119,242));
+fn reload_display(tokens: &mut Vec<Token>, display: &mut Calculator) {
 
-    let mut col = Flex::column();
-    col.add_child(display_container);
-
-    let buttons = [
-        "sin", "cos", "!", "C", "⌫",
-         "7",   "8",  "9", "^", "√",
-         "4",   "5",  "6", "*", "/",
-         "1",   "2",  "3", "+", "-",
-         ".",   "0",  "(", ")", "=", "HELP"
-    ];
-
-    let mut button_grid = Flex::row().cross_axis_alignment(CrossAxisAlignment::Start);
-
-    for (index, button) in buttons.iter().enumerate() {
-        let button_label = button.to_string();
-        let button = Button::new(*button)
-            .on_click(move |_ctx, data: &mut Calculator, _env| {
-                match button_label.as_str() {
-                    "C" => { data.display.clear(); },
-                    "⌫" => { data.display.pop(); },
-                    _ => { data.display.push_str(&button_label); },
-                }
-            })
-            .border(Color::rgb8(24,119,242), 1.0)
-            .expand();
-
-        if index % 5 == 0 && index != 0 {
-            col.add_flex_child(button_grid, 1.0);
-            button_grid = Flex::row().cross_axis_alignment(CrossAxisAlignment::Start);
-        }
-
-        button_grid.add_flex_child(button.padding(2.0).background(Color::BLACK), 1.0);
-    }
-
-    col.add_flex_child(button_grid, 1.0);
-    col
 }
