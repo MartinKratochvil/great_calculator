@@ -15,3 +15,4 @@ GCC is Great Calculator
 
 Licence
 -----------
+Tento projekt je licencován pod GNU General Public License verze 3.0
