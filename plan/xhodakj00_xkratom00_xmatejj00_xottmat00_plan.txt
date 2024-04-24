@@ -1,0 +1,21 @@
+Termíny:
+20.3.2024 - Testy pro mat. knihovnu
+31.3.2024 - Matematická knihovna
+7.4.2024 - Grafické rozhraní
+14.4.2024 - Instalační balíčky
+21.4.2024 - Poslední kontroly a odevzdání
+
+Úkoly:
+vytvoření testů pro funkčnost kalkulačky - Matyáš
+Matematická knihovna - Martin
+Grafické rozhraní - Honza M.
+Vytvoření instalačních balíčků - Honza H.
+Dokumentace - Honza H.
+
+Komunikace:
+Vlastní discord server
+Pro rozdělování úkolů Trello
+
+Správa vezrí:
+GitHub
+Nahlédnutí pomocí uživatele ivskontrola na GitHubu

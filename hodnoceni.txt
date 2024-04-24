@@ -1,0 +1,4 @@
+xhodakj00 100 (Testy k mat. knihovně + knihovna, Profiling,Věci okolo)
+xmatejj00 100 (GUI)
+xkratom00 100 (Zpracování frontendu)
+xottmat00 100 (Zpracování backendu)
