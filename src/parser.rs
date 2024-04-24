@@ -221,6 +221,13 @@ impl Tree {
     /// 
     /// `returns` Result<`Tree`, `ErrorCalls`>
     fn parse_addition(mut tokens_or_trees: Vec<TokenOrTree>) -> Result<Tree, ErrorCalls> {
+        /// # put_unary_function
+        /// Arguments: `stack`, `tok`
+        /// 
+        /// Takes in two arguments stack and tok
+        /// Pops the topmost item on stack and creates the tree with the binary function pointing to it
+        /// Pushes the tree back to stack
+        /// 
         #[macro_export]
         macro_rules! put_unary_function {
             ($stack: expr, $tok: expr) => {
