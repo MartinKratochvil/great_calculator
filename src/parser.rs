@@ -1,8 +1,12 @@
-use std::fmt::write;
+//! # parser
+//! 
+//! Program made for parsing math expression from tokens and converting them to parse tree.
 
 use crate::our_math_lib::{add, cos, div, fact, mul, pwr, sin, sqrt, sub};
 
-//Token které příjmá kalkulačka
+/// # Token
+/// 
+/// Token that is returned by GUI.
 #[derive(Clone)]
 pub enum Token {
     Value(f64),
@@ -20,6 +24,10 @@ pub enum Token {
 }
 
 impl Token {
+    /// # Token::to_binary
+    /// Converts `Token` to `BinaryFunctions`.
+    /// 
+    /// `returns` `BinaryFunctions`
     fn to_binary(&self) -> BinaryFunctions {
         match self {
             Token::Plus => BinaryFunctions::Add,
@@ -31,6 +39,11 @@ impl Token {
             _ => panic!(),
         }
     }
+
+    /// # Token::to_unary
+    /// 
+    /// Converts `Token` to `UnaryFunctions`.
+    /// `returns` `UnaryFunctions`
     fn to_unary(&self) -> UnaryFunctions {
         match self {
             Token::Minus => UnaryFunctions::Negate,
@@ -42,6 +55,11 @@ impl Token {
     }
 }
 
+
+/// # BinaryFunctinos
+/// 
+/// Enum defining binary functions.
+/// used in enum `Tree`.
 #[derive(Clone, Copy)]
 pub enum BinaryFunctions {
     Add,
@@ -52,6 +70,10 @@ pub enum BinaryFunctions {
     Root,
 }
 
+/// # UnaryFunctinos
+/// 
+/// Enum defining unary functions.
+/// Used in enum `Tree`.
 #[derive(Clone, Copy)]
 pub enum UnaryFunctions {
     Sin,
@@ -62,6 +84,10 @@ pub enum UnaryFunctions {
 
 //definování funkcí pro enum BinaryFuncion
 impl BinaryFunctions {
+    /// # BinaryFunctions::execute
+    /// Takes in two arguments type f64 and calls operation based on enum `BinaryFunctions` it was called on.
+    /// 
+    /// `returns` `f64`
     fn execute(&self, x: f64, y: f64) -> f64 {
         match self {
             BinaryFunctions::Add => add(x, y),
@@ -76,6 +102,10 @@ impl BinaryFunctions {
 
 //definování funkcí pro enum UnaryFuncion
 impl UnaryFunctions {
+    /// # UnaryFunctions::execute
+    /// Takes in two arguments type f64 and calls operation based on enum `UnaryFunctions` it was called on.
+    /// 
+    /// `returns` `f64`
     fn execute(&self, x: f64) -> f64 {
         match self {
             UnaryFunctions::Sin => sin(x),
@@ -86,6 +116,9 @@ impl UnaryFunctions {
     }
 }
 
+/// # ErrorCalls
+/// 
+/// Enum representing possible errors.
 #[derive(Clone, Copy)]
 pub enum ErrorCalls{
     UnclosedParentheses,
@@ -95,10 +128,13 @@ pub enum ErrorCalls{
     BinaryFuncionWithoutArgument,
     UnconectedValues,
     MathError,
-    WTF, //This should never occur
+    UnexpectedError, //This should never occur
 }
 
 impl std::fmt::Display for ErrorCalls {
+    /// # ErrorCalls::fmt
+    /// 
+    /// Implements trait display for the enum ErrorCalls.
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::UnclosedParentheses => write!(f, "Error: Unclosed parentheses"),
@@ -108,12 +144,22 @@ impl std::fmt::Display for ErrorCalls {
             Self::BinaryFuncionWithoutArgument => write!(f, "Error: Operator without argument"),
             Self::UnconectedValues => write!(f, "Error: Operands without operator"),
             Self::MathError => write!(f, "Error: Math Error"),
-            Self::WTF => write!(f, "Error: Something unexpected happened"),
+            Self::UnexpectedError => write!(f, "Error: Something unexpected happened"),
         }
     }
 }
 
 impl Tree {
+    /// # Tree::parentheses
+    /// 
+    /// Aguments: `stack`, `tokens_or_trees`
+    /// `tokens_or_trees` represents the current imput of Tree::parse_addition
+    /// `tokens_or_trees` represents the current stack of Tree::parse_addition
+    /// 
+    /// Takes input that is in parentheses and once it reaches the end of parentheses
+    /// recursively calls Tree::parse_addition with the insed of them.
+    /// 
+    /// `returns` Result<`TokenOrTree`, `ErrorCalls`>
     fn parentheses( //This function represents state Q1 and Q3
         stack: &mut Vec<TokenOrTree>,
         tokens_or_trees: &mut Vec<TokenOrTree>,
@@ -164,11 +210,24 @@ impl Tree {
             Ok(result_tree)
         }
         else {
-            Err(ErrorCalls::WTF) //wtf
+            Err(ErrorCalls::UnexpectedError) //UnexpectedError
         }
     }
 
+    /// # Tree::parse_addition
+    /// 
+    /// Arguments: token_or_trees: Vec<TokenOrTree>
+    /// Parses the imput and converts it into enum Tree.
+    /// 
+    /// `returns` Result<`Tree`, `ErrorCalls`>
     fn parse_addition(mut tokens_or_trees: Vec<TokenOrTree>) -> Result<Tree, ErrorCalls> {
+        /// # put_unary_function
+        /// Arguments: `stack`, `tok`
+        /// 
+        /// Takes in two arguments stack and tok
+        /// Pops the topmost item on stack and creates the tree with the binary function pointing to it
+        /// Pushes the tree back to stack
+        /// 
         #[macro_export]
         macro_rules! put_unary_function {
             ($stack: expr, $tok: expr) => {
@@ -178,7 +237,7 @@ impl Tree {
                             kind: $tok.to_unary(),
                             x: Box::new(match popped {
                                 TokenOrTree::Tree { tree } => tree,
-                                _ => return Err(ErrorCalls::WTF),
+                                _ => return Err(ErrorCalls::UnexpectedError),
                             }),
                         },
                     })
@@ -186,6 +245,10 @@ impl Tree {
                     return Err(ErrorCalls::UnaryFunctionWithoutArgument); //UnaryFunctionWithout Argument
                 }
             };
+        }
+
+        if tokens_or_trees.len() == 0 {
+            return Err(ErrorCalls::BinaryFuncionWithoutArgument);
         }
 
         #[derive(PartialEq)]
@@ -327,11 +390,11 @@ impl Tree {
                                     }
                                 )
                             },
-                            TokenOrTree::Token {..} => return Err(ErrorCalls::WTF) //wtf
+                            TokenOrTree::Token {..} => return Err(ErrorCalls::UnexpectedError) //UnexpectedError
                         }
                     }
                     else { //this thing should never occur
-                        return Err(ErrorCalls::WTF);//wtf
+                        return Err(ErrorCalls::UnexpectedError);//UnexpectedError
                     }
                     state = States::QLoop;
                 }
@@ -346,7 +409,16 @@ impl Tree {
         Tree::parse_multiplication(stack)
     }
 
+     /// # Tree::parse_multiplication
+    /// 
+    /// Arguments: token_or_trees: Vec<TokenOrTree>
+    /// Parses the imput and converts it into enum Tree.
+    /// 
+    /// `returns` Result<`Tree`, `ErrorCalls`>
     fn parse_multiplication(mut tokens_or_trees: Vec<TokenOrTree>) -> Result<Tree, ErrorCalls> {
+        if tokens_or_trees.len() == 0 {
+            return Err(ErrorCalls::BinaryFuncionWithoutArgument);
+        }
         let mut stack: Vec<TokenOrTree> = Vec::new();
         while let Some(token_or_tree) = tokens_or_trees.pop() {
             match &token_or_tree {
@@ -373,7 +445,7 @@ impl Tree {
                     //if its stronger operarion than */, then push them onto stack
                     Token::Pow | Token::Sqrt => stack.push(token_or_tree),
                     //Everything else was proccesed during parse_addition phase
-                    _ => return Err(ErrorCalls::WTF), //wtf
+                    _ => return Err(ErrorCalls::UnexpectedError), //UnexpectedError
                 },
             }
         }
@@ -382,7 +454,16 @@ impl Tree {
         Tree::parse_power(stack)
     }
 
+     /// # Tree::parse_power
+    /// 
+    /// Arguments: token_or_trees: Vec<TokenOrTree>
+    /// Parses the imput and converts it into enum Tree.
+    /// 
+    /// `returns` Result<`Tree`, `ErrorCalls`>
     fn parse_power(mut tokens_or_trees: Vec<TokenOrTree>) -> Result<Tree, ErrorCalls> {
+        if tokens_or_trees.len() == 0 {
+            return Err(ErrorCalls::BinaryFuncionWithoutArgument);
+        }
         let mut stack: Vec<TokenOrTree> = Vec::new();
         while let Some(token_or_tree) = tokens_or_trees.pop() {
             match &token_or_tree {
@@ -399,7 +480,7 @@ impl Tree {
                         });
                     }
                     //everithing besides power and root has already been processed in prior phases
-                    _ => return Err(ErrorCalls::WTF),//wtf
+                    _ => return Err(ErrorCalls::UnexpectedError),//UnexpectedError
                 },
             }
         }
@@ -409,15 +490,10 @@ impl Tree {
         if stack.len() == 1 {
             match stack.pop().unwrap() {
                 TokenOrTree::Tree { tree } => Ok(tree),
-                _ => Err(ErrorCalls::WTF), //wtf
+                _ => Err(ErrorCalls::UnexpectedError), //UnexpectedError
             }
         } else {
-            //Err(ErrorCalls::UnconectedValues) //Values without functions
-            //stack.pop();
-            match stack.pop().unwrap() {
-                TokenOrTree::Tree { tree } => Ok(tree),
-                _ => Err(ErrorCalls::WTF), //wtf
-            }
+            Err(ErrorCalls::UnconectedValues) //Values without functions
         }
     }
 
@@ -425,7 +501,9 @@ impl Tree {
         Tree::parse_addition(TokenOrTree::create(tokens))
     }
 
-    //Funkce pro vypočtení stromu Tree
+    /// # Tree::calculate
+    /// 
+    /// Takes tree and calculates the value of the expession within it.
     pub fn calculate(&self) -> f64 {
         match self {
             Tree::BinaryFunction { kind, x, y } => kind.execute(x.calculate(), y.calculate()),
@@ -435,7 +513,8 @@ impl Tree {
     }
 }
 
-//Rekurzivní enum pro celý výraz
+/// # Tree
+/// Enum representing the expression in calculator.
 #[derive(Clone)]
 pub enum Tree {
     BinaryFunction {
@@ -450,6 +529,9 @@ pub enum Tree {
     Value(f64),
 }
 
+/// # TokenOrTree
+/// Enum capable of hoding both enum Token and enum Tree.
+/// Used as intermediate value in parsing.
 #[derive(Clone)]
 enum TokenOrTree {
     Tree { tree: Tree },
@@ -457,6 +539,12 @@ enum TokenOrTree {
 }
 
 impl TokenOrTree {
+    /// # TokenOrTree::create
+    /// 
+    /// Arguments: tokens: Vec<Token>
+    /// 
+    /// Takes in vector of enum Token and parses it to vector of enum TokenOrTree.
+    /// `returns` Vec<`TokenOrTree`>
     pub fn create(mut tokens: Vec<Token>) -> Vec<TokenOrTree> {
         tokens.reverse();
         let mut tokens_or_trees: Vec<TokenOrTree> = Vec::new();

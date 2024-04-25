@@ -73,7 +73,7 @@ fn main() {
                 let mut tokens_lock = tokens_clone.lock().unwrap();
                 let mut num_lock = num_buff_clone.lock().unwrap();
                 func(&mut tokens_lock, &mut num_lock, key.clone());
-                reload_display(&mut tokens_lock, data);
+                reload_display(&mut tokens_lock, &mut num_lock, data);
             })
             .border(Color::rgb8(24,119,242), 1.0)
             .expand();
@@ -115,7 +115,6 @@ fn handle_number(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) 
         }
         num_buff.push(digit);
         println!("add: {}", label);
-        //TODO: print digit
     }
 
 }
@@ -127,9 +126,7 @@ fn handle_point(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
             if !num_buff.contains(dec_point) {
                 num_buff.push(dec_point);
                 println!("add: {}", label);
-                //TODO: print dot
             }
-
         }
     }
 }
@@ -138,56 +135,73 @@ fn handle_binary_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: Str
     if !push_num_buff(tokens, num_buff) && tokens.last().is_none() {
         return;
     }
+    match tokens.last() {
+        Some(Token::Value(..)) => {}
+        Some(Token::Exclamation) => {}
+        Some(Token::RightParentheses) => {}
+        _ => return
+    }
 
     println!("push: {}", label.as_str());
     tokens.push(get_token_from_str(label));
-    //TODO: print operation
 }
 
 fn handle_minus(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     if !push_num_buff(tokens, num_buff) && tokens.last().is_none() {
         return;
     }
+    match tokens.last() {
+        Some(Token::Value(..)) => {}
+        Some(Token::Exclamation) => {}
+        _ => return
+    }
 
     println!("push: {}", label.as_str());
     tokens.push(get_token_from_str(label));
-    //TODO: print operation
 }
 
 fn handle_gon_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     push_num_buff(tokens, num_buff);
+    match tokens.last() {
+        Some(Token::Value(..)) => return,
+        Some(Token::RightParentheses) => return,
+        Some(Token::Exclamation) => return,
+        _ => {}
+    }
+
     println!("push: {}", label);
     tokens.push(get_token_from_str(label));
-    //TODO: print gon func
 }
 
 fn handle_factorial(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-    push_num_buff(tokens, num_buff);
+    if !push_num_buff(tokens, num_buff) {
+        return;
+    }
+
     println!("push: {}", label);
     tokens.push(get_token_from_str(label));
-    //TODO: print factorial
 }
 
 fn handle_open_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-    if !push_num_buff(tokens, num_buff) {
-        match tokens.last() {
-            Some(Token::RightParentheses) => return,
-            Some(Token::Exclamation) => return,
-            _ => {}
-        }
-        println!("push: {}", label);
-        tokens.push(get_token_from_str(label));
-        //TODO: print bracket
-
+    push_num_buff(tokens, num_buff);
+    match tokens.last() {
+        Some(Token::Value(..)) => return,
+        Some(Token::Exclamation) => return,
+        _ => {}
     }
+
+    println!("push: {}", label);
+    tokens.push(get_token_from_str(label));
 }
 
 fn handle_close_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-    if push_num_buff(tokens, num_buff) {
-        println!("push: {}", label);
-        tokens.push(get_token_from_str(label));
-        //TODO: print bracket
+    push_num_buff(tokens, num_buff);
+    if let Some(Token::LeftParentheses) = tokens.last() {
+        return;
     }
+
+    println!("push: {}", label);
+    tokens.push(get_token_from_str(label));
 }
 
 #[allow(unused_variables)]
@@ -199,13 +213,12 @@ fn handle_delete(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) 
     }
 
     tokens.pop();
-    //Todo: remove last item
 }
 
 #[allow(unused_variables)]
 fn handle_clear(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     tokens.clear();
-    //Todo: clear list
+    num_buff.clear();
 }
 
 #[allow(unused_variables)]
@@ -214,20 +227,20 @@ fn handle_calculate(tokens: &mut Vec<Token>, num_buff: &mut String, label: Strin
     push_num_buff(tokens, num_buff);
     match Tree::parse(tokens.clone()) {
         Ok(tree) => {
-            let ans = tree.calculate();
-            println!("ANS: {}", ans);
-            //Todo: print answer
+            num_buff.push_str(tree.calculate().to_string().as_str())
         }
         Err(er) => {
-            println!("ERROR!!!{}", er.to_string());
-            //Todo: print error
+            num_buff.push_str("ERROR");
         }
     }
     tokens.clear();
 }
 
 fn push_num_buff(tokens: &mut Vec<Token>, num_buff: &mut String) -> bool {
+    println!("buff: {}", num_buff);
+
     if num_buff.is_empty() {
+        println!("empty");
         return false;
     }
 
@@ -272,6 +285,35 @@ fn get_token_from_str(str: String) -> Token {
 }
 
 
-fn reload_display(tokens: &mut Vec<Token>, display: &mut Calculator) {
+fn get_str_from_token(token: Token) -> String {
+    match token {
+        Token::Sin=> "sin".to_string(),
+        Token::Cos => "cos".to_string(),
+        Token::Exclamation => "!".to_string(),
+        Token::Pow => "^".to_string(),
+        Token::Sqrt => "√".to_string(),
+        Token::Star => "*".to_string(),
+        Token::Slash => "/".to_string(),
+        Token::Plus => "+".to_string(),
+        Token::Minus => "-".to_string(),
+        Token::LeftParentheses => "(".to_string(),
+        Token::RightParentheses => ")".to_string(),
+        Token::Value(value) => value.to_string()
+    }
+}
 
+
+fn reload_display(tokens: &mut Vec<Token>, num_buff: &mut String, display: &mut Calculator) {
+    println!("{}", num_buff);
+    display.display.clear();
+    for token in tokens {
+        display.display.push_str(get_str_from_token(token.clone()).as_str());
+        display.display.push(' ');
+    }
+
+    display.display.push_str(num_buff);
+
+    if num_buff == "ERROR" {
+        num_buff.clear();
+    }
 }

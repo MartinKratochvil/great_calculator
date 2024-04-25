@@ -2,6 +2,8 @@
 //!
 //! A math library for our calculator.
 
+use std::{f64::{INFINITY, NAN}};
+
 /// Addition of two numbers
 ///#
 /// Function requires two arguments of type f64
@@ -189,11 +191,27 @@ pub fn sqrt(x: f64, n:f64) -> f64{
 ///  assert_eq!(result,1.0);
 /// ```
 pub fn fact(x: f64) -> f64{  //Counts factorial using recursion
-    if x <= 1.0{
-        1.0
-    }else {
-        fact(x - 1.0) * x //function calls itself with argument x-1 until it reduces to 1, then it multiplies by x in every level
+    if x == INFINITY.into(){
+        return INFINITY.into();
     }
+    if x == NAN.into(){
+        return NAN.into();
+    }
+    if x != x.trunc() {
+        return NAN.into();
+    }
+    if x < 0.0 {
+        return NAN.into();
+    }
+    if x > 170.0 {
+        return INFINITY.into();
+    }
+    let x = x as i64;
+    let mut result = 1.0;
+    for i in 1..x+1 {
+        result *= i as f64;
+    }
+    result
 }
 
 /// Sine of a number
