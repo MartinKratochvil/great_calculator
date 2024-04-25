@@ -1,5 +1,5 @@
 FILE_NAME = ../xhodakj00_xkratom00_xmatejj00_xottmat00
-REPO = ../mockup ../plan ../profiling ../src ../tests ../Cargo.lock ../.gitignore ../Cargo.toml ../debugging.png ../hodnoceni.txt ../LICENSE ../README.md ../skutecnost.txt ../screenshot.png ../dokumentace.pdf
+REPO = ../mockup ../plan ../profiling ../src ../tests ../Cargo.lock ../.gitignore ../Cargo.toml ../debugging.png ../hodnoceni.txt ../LICENSE ../README.md ../skutecnost.txt ../screenshot.png ../dokumentace.pdf ../.git
 
 all:
 	cargo build --all-targets --release
@@ -15,7 +15,8 @@ pack:
 	rm -rf ../build 
 	cp -r $(REPO) $(FILE_NAME)/repo 
 	cp Makefile $(FILE_NAME)/repo/src/
-#tady přidat packige do $(FILE_NAME)/install packige pro main a stddev
+	cp ../ggc.deb $(FILE_NAME)/install
+	cp ../stddev.deb $(FILE_NAME)/install
 	zip -r $(FILE_NAME).zip $(FILE_NAME)
 	rm -rf $(FILE_NAME)
 
