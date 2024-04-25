@@ -2,6 +2,7 @@ use indexmap::IndexMap;
 use std::sync::{Arc, Mutex};
 use druid::widget::{Button, Flex, Label, CrossAxisAlignment, Container};
 use druid::{AppLauncher, WidgetExt, WindowDesc, Color, Data, Lens};
+use druid::platform_menus::mac::file::print;
 use great_calculator::parser::{Token, Tree};
 
 
@@ -55,11 +56,11 @@ fn main() {
         ("0".to_string(), handle_number as InputHandler),
         ("(".to_string(), handle_open_bracket as InputHandler),
         (")".to_string(), handle_close_bracket as InputHandler),
-        ("=".to_string(), handle_calculate as InputHandler)
+        ("=".to_string(), handle_calculate as InputHandler),
     ]);
 
     let display = Label::new(|data: &Calculator, _env: &_| format!("{}", data.display))
-        .with_text_size(64.0)
+        .with_text_size(48.0)
         .align_right()
         .expand_width();
 
@@ -100,6 +101,15 @@ fn main() {
 
         index += 1;
     }
+
+    let button = Button::new("HELP")
+        .on_click(move |_ctx, data: &mut Calculator, _env| {
+            data.display.clear();
+            data.display.push_str("Zadej příklad, zmáčkni rovná se a zobrazí se výsledek");
+        })
+        .border(Color::rgb8(24,119,242), 1.0)
+        .expand();
+    col.add_flex_child(button, 1.0);
 
     let window = WindowDesc::new(col)
         .window_size((400.0, 600.0))
