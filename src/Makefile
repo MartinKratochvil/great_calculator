@@ -1,13 +1,13 @@
 FILE_NAME = ../xhodakj00_xkratom00_xmatejj00_xottmat00
 REPO = ../mockup ../plan ../profiling ../src ../tests ../Cargo.lock ../.gitignore ../Cargo.toml ../debugging.png ../hodnoceni.txt ../LICENSE ../README.md ../skutecnost.txt ../screenshot.png ../dokumentace.pdf ../.git
 
-all:
+all: dependencies
 	cargo build --all-targets --release
 	mkdir -p ../build
 	cp ../target/release/main ../build/
 	cp ../target/release/stddev ../build/
 
-pack:
+pack: dependencies
 	mkdir -p $(FILE_NAME)/doc $(FILE_NAME)/install $(FILE_NAME)/repo
 	cargo doc --no-deps
 	cp -r ../target/doc/ $(FILE_NAME)/
@@ -20,30 +20,32 @@ pack:
 	zip -r $(FILE_NAME).zip $(FILE_NAME)
 	rm -rf $(FILE_NAME)
 
-clean:
+clean: dependencies
 	cargo clean
 
-test:
+test: dependencies
 	cargo test --doc
 
-doc:
+doc: dependencies
 	cargo doc --no-deps
 
-run:
+run: dependencies
 	cargo run --release --bin main
 	mkdir -p ../build
 	cp ../target/release/main ../build/
 
-profile:
+profile: dependencies
 	cargo build --release --bin stddev
 	mkdir -p ../build
 	cp ../target/release/stddev ../build/
 
-install: 
+install: depenencies
 	cargo build --release --bin main
 	sudo cp ../target/release/main /bin/ggc-bin
 	chmod +x ggc.sh
 	sudo cp ggc.sh /bin/ggc
 
+dependencies: 
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 	
 
