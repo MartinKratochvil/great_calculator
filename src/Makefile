@@ -1,5 +1,5 @@
 FILE_NAME = ../xhodakj00_xkratom00_xmatejj00_xottmat00
-REPO = ../mockup ../plan ../profiling ../src ../tests ../Cargo.lock ../.gitignore ../Cargo.toml ../debugging.png ../hodnoceni.txt ../LICENSE ../README.md ../skutecnost.txt ../screenshot.png ../dokumentace.pdf ../.git
+REPO = ../mockup ../plan ../profiling ../src ../tests ../Cargo.lock ../.gitignore ../Cargo.toml ../debugging.png ../hodnoceni.txt ../LICENSE ../README.md ../skutecnost.txt ../screenshot.png
 
 all: dependencies
 	cargo build --all-targets --release
@@ -15,11 +15,10 @@ pack: dependencies
 	rm -rf ../build 
 	cp -r $(REPO) $(FILE_NAME)/repo 
 	cp Makefile $(FILE_NAME)/repo/src/
-	cp ../ggc.deb $(FILE_NAME)/install
-	cp ../stddev.deb $(FILE_NAME)/install
+#tady přidat packige do $(FILE_NAME)/install packige pro main a stddev
 	zip -r $(FILE_NAME).zip $(FILE_NAME)
 	rm -rf $(FILE_NAME)
-
+ 
 clean: dependencies
 	cargo clean
 
@@ -39,13 +38,14 @@ profile: dependencies
 	mkdir -p ../build
 	cp ../target/release/stddev ../build/
 
-install: depenencies
+install: dependencies
 	cargo build --release --bin main
 	sudo cp ../target/release/main /bin/ggc-bin
 	chmod +x ggc.sh
 	sudo cp ggc.sh /bin/ggc
 
-dependencies: 
-	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+dependencies:
+	sudo apt install cargo
+
 	
 

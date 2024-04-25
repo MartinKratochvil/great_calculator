@@ -174,6 +174,7 @@ fn handle_binary_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: Str
         _ => return
     }
 
+    println!("push: {}", label.as_str());
     tokens.push(get_token_from_str(label));
 }
 
