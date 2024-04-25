@@ -1,5 +1,5 @@
 FILE_NAME = ../xhodakj00_xkratom00_xmatejj00_xottmat00
-REPO = ../mockup ../plan ../profiling ../src ../tests ../Cargo.lock ../.gitignore ../Cargo.toml ../debugging.png ../hodnoceni.txt ../LICENSE ../README.md ../skutecnost.txt ../screenshot.png
+REPO = ../mockup ../plan ../profiling ../src ../tests ../Cargo.lock ../.gitignore ../Cargo.toml ../debugging.png ../hodnoceni.txt ../LICENSE ../README.md ../skutecnost.txt ../screenshot.png ../dokumentace.pdf
 
 all:
 	cargo build --all-targets --release
