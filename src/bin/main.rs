@@ -132,7 +132,6 @@ fn handle_number(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) 
             _ => {}
         }
         num_buff.push(digit);
-        println!("add: {}", label);
     }
 
 }
@@ -151,7 +150,6 @@ fn handle_point(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
         if let Some(dec_point) = label.chars().last() {
             if !num_buff.contains(dec_point) {
                 num_buff.push(dec_point);
-                println!("add: {}", label);
             }
         }
     }
@@ -197,7 +195,6 @@ fn handle_gon_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String
         _ => {}
     }
 
-    println!("push: {}", label);
     tokens.push(get_token_from_str(label));
 }
 
@@ -210,11 +207,13 @@ fn handle_gon_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String
 ///
 /// `label`: String - label of the pressed button
 fn handle_factorial(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-    if !push_num_buff(tokens, num_buff) {
-        return;
+    push_num_buff(tokens, num_buff);
+    match tokens.last() {
+        Some(Token::RightParentheses) => {}
+        Some(Token::Value(..)) => {}
+        _ => return
     }
 
-    println!("push: {}", label);
     tokens.push(get_token_from_str(label));
 }
 
@@ -234,7 +233,6 @@ fn handle_open_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: St
         _ => {}
     }
 
-    println!("push: {}", label);
     tokens.push(get_token_from_str(label));
 }
 
@@ -252,7 +250,6 @@ fn handle_close_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: S
         return;
     }
 
-    println!("push: {}", label);
     tokens.push(get_token_from_str(label));
 }
 
@@ -291,8 +288,12 @@ fn handle_clear(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
 
 #[allow(unused_variables)]
 fn handle_calculate(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-    println!("numbuff: {} - tokens: {}", num_buff, tokens.len());
     push_num_buff(tokens, num_buff);
+
+    if tokens.len() == 0 {
+        return;
+    }
+
     match Tree::parse(tokens.clone()) {
         Ok(tree) => {
             num_buff.push_str(tree.calculate().to_string().as_str())
@@ -312,10 +313,7 @@ fn handle_calculate(tokens: &mut Vec<Token>, num_buff: &mut String, label: Strin
 ///
 /// `num_buff`: String - number buffer
 fn push_num_buff(tokens: &mut Vec<Token>, num_buff: &mut String) -> bool {
-    println!("buff: {}", num_buff);
-
     if num_buff.is_empty() {
-        println!("empty");
         return false;
     }
 
@@ -334,8 +332,7 @@ fn push_num_buff(tokens: &mut Vec<Token>, num_buff: &mut String) -> bool {
             num_buff.clear();
             true
         }
-        Err(err) => {
-            println!("Failed to parse: {}", err);
+        Err(..) => {
             num_buff.clear();
             false
         }
@@ -401,7 +398,6 @@ fn get_str_from_token(token: Token) -> String {
 /// `display`: Calculator - label of inputted data
 
 fn reload_display(tokens: &mut Vec<Token>, num_buff: &mut String, display: &mut Calculator) {
-    println!("{}", num_buff);
     display.display.clear();
     for token in tokens {
         display.display.push_str(get_str_from_token(token.clone()).as_str());
