@@ -39,10 +39,14 @@ profile:
 	mkdir -p ../build
 	cp ../target/release/stddev ../build/
 
-install: 
+install: dependencies
 	cargo build --release --bin main
 	sudo cp ../target/release/main /bin/ggc-bin
 	chmod +x ggc.sh
 	sudo cp ggc.sh /bin/ggc
 	
 
+dependencies:
+	sudo apt install curl
+	curl https://sh.rustup.rs/ -sSf | sh
+	sudo apt-get install libgtk-3-dev
