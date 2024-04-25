@@ -5,14 +5,26 @@ use druid::{AppLauncher, WidgetExt, WindowDesc, Color, Data, Lens};
 use great_calculator::parser::{Token, Tree};
 
 
+/// `InputHandler` :type - type for handers
+/// #
 type InputHandler = fn(&mut Vec<Token>, &mut String, String);
+/// `COLUMNS` :i32 - number of columns of buttons
+/// #
 static COLUMNS: i32 = 5;
 
+/// `Calculator` :struct
+/// #
+/// `display`: String - text of inputted data
 #[derive(Clone, Data, Lens)]
 struct Calculator {
     display: String,
 }
 
+
+///`main` function called after running program
+///#
+/// generates components and load app window
+/// creates vector of inputs
 fn main() {
     let event_map: IndexMap<String, InputHandler> = IndexMap::from([
         ("sin".to_string(), handle_gon_func as InputHandler),
@@ -37,7 +49,7 @@ fn main() {
         ("2".to_string(), handle_number as InputHandler),
         ("3".to_string(), handle_number as InputHandler),
         ("+".to_string(), handle_binary_func as InputHandler),
-        ("-".to_string(), handle_minus as InputHandler),
+        ("-".to_string(), handle_binary_func as InputHandler),
 
         (".".to_string(), handle_point as InputHandler),
         ("0".to_string(), handle_number as InputHandler),
@@ -89,8 +101,6 @@ fn main() {
         index += 1;
     }
 
-
-
     let window = WindowDesc::new(col)
         .window_size((400.0, 600.0))
         .title("GGC - Great calculator");
@@ -105,6 +115,14 @@ fn main() {
 
 }
 
+/// handle_number add number to number stack
+///#
+/// params
+/// `tokens`: Vec<Token> - vector of inputted values
+///
+/// `num_buff`: String - number buffer
+///
+/// `label`: String - label of the pressed button
 #[allow(unused_variables)]
 fn handle_number(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     if let Some(digit) = label.chars().last() {
@@ -119,6 +137,14 @@ fn handle_number(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) 
 
 }
 
+/// handle_point add decimal point to number stack
+///#
+/// params
+/// `tokens`: Vec<Token> - vector of inputted values
+///
+/// `num_buff`: String - number buffer
+///
+/// `label`: String - label of the pressed button
 #[allow(unused_variables)]
 fn handle_point(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     if !num_buff.chars().last().is_none() {
@@ -131,6 +157,14 @@ fn handle_point(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     }
 }
 
+/// handle_binary_func add token of binary operations to tokens
+///#
+/// params
+/// `tokens`: Vec<Token> - vector of inputted values
+///
+/// `num_buff`: String - number buffer
+///
+/// `label`: String - label of the pressed button
 fn handle_binary_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     if !push_num_buff(tokens, num_buff) && tokens.last().is_none() {
         return;
@@ -146,20 +180,14 @@ fn handle_binary_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: Str
     tokens.push(get_token_from_str(label));
 }
 
-fn handle_minus(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
-    if !push_num_buff(tokens, num_buff) && tokens.last().is_none() {
-        return;
-    }
-    match tokens.last() {
-        Some(Token::Value(..)) => {}
-        Some(Token::Exclamation) => {}
-        _ => return
-    }
-
-    println!("push: {}", label.as_str());
-    tokens.push(get_token_from_str(label));
-}
-
+/// handle_gon_func add token of goniometric function to tokens
+///#
+/// params
+/// `tokens`: Vec<Token> - vector of inputted values
+///
+/// `num_buff`: String - number buffer
+///
+/// `label`: String - label of the pressed button
 fn handle_gon_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     push_num_buff(tokens, num_buff);
     match tokens.last() {
@@ -173,6 +201,14 @@ fn handle_gon_func(tokens: &mut Vec<Token>, num_buff: &mut String, label: String
     tokens.push(get_token_from_str(label));
 }
 
+/// handle_factorial add token of factorial to tokens
+///#
+/// params
+/// `tokens`: Vec<Token> - vector of inputted values
+///
+/// `num_buff`: String - number buffer
+///
+/// `label`: String - label of the pressed button
 fn handle_factorial(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     if !push_num_buff(tokens, num_buff) {
         return;
@@ -182,6 +218,14 @@ fn handle_factorial(tokens: &mut Vec<Token>, num_buff: &mut String, label: Strin
     tokens.push(get_token_from_str(label));
 }
 
+/// handle_open_bracket add token of opened bracket to tokens
+///#
+/// params
+/// `tokens`: Vec<Token> - vector of inputted values
+///
+/// `num_buff`: String - number buffer
+///
+/// `label`: String - label of the pressed button
 fn handle_open_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     push_num_buff(tokens, num_buff);
     match tokens.last() {
@@ -194,6 +238,14 @@ fn handle_open_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: St
     tokens.push(get_token_from_str(label));
 }
 
+/// handle_close_bracket add token of closed bracket to tokens
+///#
+/// params
+/// `tokens`: Vec<Token> - vector of inputted values
+///
+/// `num_buff`: String - number buffer
+///
+/// `label`: String - label of the pressed button
 fn handle_close_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     push_num_buff(tokens, num_buff);
     if let Some(Token::LeftParentheses) = tokens.last() {
@@ -204,6 +256,14 @@ fn handle_close_bracket(tokens: &mut Vec<Token>, num_buff: &mut String, label: S
     tokens.push(get_token_from_str(label));
 }
 
+/// handle_delete remove last token from tokens
+///#
+/// params
+/// `tokens`: Vec<Token> - vector of inputted values
+///
+/// `num_buff`: String - number buffer
+///
+/// `label`: String - label of the pressed button
 #[allow(unused_variables)]
 fn handle_delete(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     if !num_buff.is_empty() {
@@ -215,6 +275,14 @@ fn handle_delete(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) 
     tokens.pop();
 }
 
+/// handle_clear clears all tokens
+///#
+/// params
+/// `tokens`: Vec<Token> - vector of inputted values
+///
+/// `num_buff`: String - number buffer
+///
+/// `label`: String - label of the pressed button
 #[allow(unused_variables)]
 fn handle_clear(tokens: &mut Vec<Token>, num_buff: &mut String, label: String) {
     tokens.clear();
@@ -236,6 +304,13 @@ fn handle_calculate(tokens: &mut Vec<Token>, num_buff: &mut String, label: Strin
     tokens.clear();
 }
 
+
+/// push_num_buff create f64 number from num_buff and pushes it to tokens
+///#
+/// params
+/// `tokens`: Vec<Token> - vector of inputted values
+///
+/// `num_buff`: String - number buffer
 fn push_num_buff(tokens: &mut Vec<Token>, num_buff: &mut String) -> bool {
     println!("buff: {}", num_buff);
 
@@ -267,6 +342,13 @@ fn push_num_buff(tokens: &mut Vec<Token>, num_buff: &mut String) -> bool {
     }
 }
 
+
+/// get_token_from_str
+///#
+/// param
+/// `str`: String - string to match
+/// #
+/// `return`: Token - matched token
 fn get_token_from_str(str: String) -> Token {
     match str.as_str() {
         "sin" => Token::Sin,
@@ -285,6 +367,12 @@ fn get_token_from_str(str: String) -> Token {
 }
 
 
+/// get_str_from_token
+///#
+/// param
+/// `token`: Token - token to match
+/// #
+/// `return`: String - matched string
 fn get_str_from_token(token: Token) -> String {
     match token {
         Token::Sin=> "sin".to_string(),
@@ -302,6 +390,15 @@ fn get_str_from_token(token: Token) -> String {
     }
 }
 
+
+/// reload_display reload the label text from tokens and number buffer
+///#
+/// params
+/// `tokens`: Vec<Token> - vector of inputted values
+///
+/// `num_buff`: String - number buffer
+///
+/// `display`: Calculator - label of inputted data
 
 fn reload_display(tokens: &mut Vec<Token>, num_buff: &mut String, display: &mut Calculator) {
     println!("{}", num_buff);
