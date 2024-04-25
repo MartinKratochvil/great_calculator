@@ -1,0 +1,3 @@
+Hlavní rozdíl mezi plánem a skutešností je dodržování termínů.
+Další věc je jenom, že během vývoje jsme přišli na to, jak řešit problémy jinýmy způsoby, načež došlo k reorganizaci úkolů.
+A také se kalkulačka stala komlexnější, než jsme plánovali.

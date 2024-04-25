@@ -47,9 +47,9 @@ fn main() {
 /// `return` :f64 - standard deviation
 fn stddev(count:f64,sum:f64,sum_of_powers:f64) -> f64{
 
-        let average:f64 = div(sum,count as f64);             //average
-        let mut intermediate:f64 = sub(sum_of_powers,mul(count as f64, pwr(average,2.0)));  //intermediate = (sum_of_powers - count * average^2
-        intermediate = div(intermediate,sub(count as f64, 1.0));   // intermediate = intermediate/(count -1)
+        let average:f64 = div(sum,count);             //average
+        let mut intermediate:f64 = sub(sum_of_powers,mul(count, pwr(average,2.0)));  //intermediate = (sum_of_powers - count * average^2
+        intermediate = div(intermediate,sub(count, 1.0));   // intermediate = intermediate/(count -1)
         let result:f64 = sqrt(intermediate,2.0);                     // sqrt of intermediate
         result
 }
