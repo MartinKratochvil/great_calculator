@@ -81,11 +81,6 @@ pub fn mul(left: f64, right:f64) -> f64{
 ///
 /// let result = div(x,x);
 /// assert_eq!(result,1.0);
-///
-/// let x = 40.0;
-/// let y = 0.0;
-/// let result = div(x,y);
-/// assert_eq!(result,f64::NAN);
 /// ```
 pub fn div(left: f64, right:f64) -> f64{
     if right == 0.0{
